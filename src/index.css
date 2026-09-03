@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #F5F4EF;
+    color: #151713;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@media print {
+  body {
+    background: #FFFFFF !important;
+    color: #111310 !important;
+  }
+  header, nav, aside, .no-print {
+    display: none !important;
+  }
+}
+
+/* Primary technical sans for headings, gauges, metrics */
+.font-display {
+  font-family: 'Chakra Petch', sans-serif;
+  letter-spacing: 0.02em;
+}
+
+/* Secondary humanist sans for labels and body (replaces blanket monospace) */
+.font-hud {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Strict technical monospace for hardware codes, UUIDs, RFID tags */
+.font-code {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* Neutralized Overlay (Clean Subtle Tint, No Neon CRT Scanlines) */
+.scanlines-overlay {
+  display: none;
+}
+
+/* Moving vertical laser scanner line */
+@keyframes sweepScan {
+  0% {
+    top: 0%;
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    top: 100%;
+    opacity: 0.6;
+  }
+}
+
+.scanner-laser {
+  animation: sweepScan 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+/* Industrial Hazard Pattern */
+.hazard-stripe {
+  background: repeating-linear-gradient(
+    -45deg,
+    #d97706,
+    #d97706 12px,
+    #111827 12px,
+    #111827 24px
+  );
+}
+
+.hazard-stripe-danger {
+  background: repeating-linear-gradient(
+    -45deg,
+    #dc2626,
+    #dc2626 12px,
+    #111827 12px,
+    #111827 24px
+  );
+}
+
+/* Clean Matte Industrial Box */
+.hud-box {
+  position: relative;
+  border: 1px solid #1e293b;
+  background: #0b1017;
+}
+
+.hud-box::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 6px;
+  height: 6px;
+  border-top: 2px solid #475569;
+  border-left: 2px solid #475569;
+}
+
+.hud-box::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 6px;
+  height: 6px;
+  border-bottom: 2px solid #475569;
+  border-right: 2px solid #475569;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #080c12;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
