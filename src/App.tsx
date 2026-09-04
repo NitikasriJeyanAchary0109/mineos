@@ -20,8 +20,27 @@ import { MineOverviewPage } from './pages/controlroom/MineOverviewPage';
 import { ControlRoomDashboardPage } from './pages/controlroom/ControlRoomDashboardPage';
 import { SelectedWorkerPage } from './pages/controlroom/SelectedWorkerPage';
 import { CriticalAlertPage } from './pages/controlroom/CriticalAlertPage';
-import { ManageWorkersPage } from './pages/controlroom/ManageWorkersPage';
 import { SafetyReportsPage } from './pages/controlroom/SafetyReportsPage';
+import { ManageWorkersPage } from './pages/controlroom/ManageWorkersPage';
+// Mobile Application Suite (Field Companion for Android Phones)
+import { MobileDashboardPage } from './pages/mobile/MobileDashboardPage';
+import { MobileMine3DPage } from './pages/mobile/MobileMine3DPage';
+import { MobileWorkersPage } from './pages/mobile/MobileWorkersPage';
+import { MobileHazardsPage } from './pages/mobile/MobileHazardsPage';
+import { MobileReportsPage } from './pages/mobile/MobileReportsPage';
+import { MobileChampionsPage } from './pages/mobile/MobileChampionsPage';
+import { MobileManageWorkersPage } from './pages/mobile/MobileManageWorkersPage';
+
+// Smart Home Route: detects physical phone / small screen and routes to mobile application
+const SmartHomeRedirect: React.FC = () => {
+  const isMobile =
+    typeof window !== 'undefined' &&
+    (window.innerWidth < 800 ||
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      (window as any).Capacitor?.isNativePlatform?.());
+
+  return isMobile ? <Navigate to="/mobile" replace /> : <Navigate to="/controlroom/dashboard" replace />;
+};
 
 export function App() {
   return (
@@ -35,11 +54,22 @@ export function App() {
             {/* Page Routing with Role-Based Access Control */}
             <div className="flex-1">
               <Routes>
-                {/* Default Landing: Direct to Control Room Console */}
-                <Route path="/" element={<Navigate to="/controlroom/dashboard" replace />} />
+                {/* Default Landing: Direct to Mobile App on Phones, Control Room on Desktop */}
+                <Route path="/" element={<SmartHomeRedirect />} />
 
                 {/* Authentication Page */}
                 <Route path="/login" element={<LoginPage />} />
+
+                {/* ======================================================= */}
+                {/* NATIVE MOBILE APPLICATION SUITE (/mobile/*) */}
+                {/* ======================================================= */}
+                <Route path="/mobile" element={<MobileDashboardPage />} />
+                <Route path="/mobile/mine" element={<MobileMine3DPage />} />
+                <Route path="/mobile/workers" element={<MobileWorkersPage />} />
+                <Route path="/mobile/hazards" element={<MobileHazardsPage />} />
+                <Route path="/mobile/reports" element={<MobileReportsPage />} />
+                <Route path="/mobile/champions" element={<MobileChampionsPage />} />
+                <Route path="/mobile/manage-workers" element={<MobileManageWorkersPage />} />
 
                 {/* Worker Mobile In-Mine Interface */}
                 <Route path="/worker-home" element={<WorkerHomePage />} />

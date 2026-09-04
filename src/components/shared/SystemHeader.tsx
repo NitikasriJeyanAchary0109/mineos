@@ -62,7 +62,7 @@ export const SystemHeader: React.FC = () => {
 
   const isControlRoom = location.pathname.startsWith('/controlroom');
 
-  if (location.pathname === '/login') {
+  if (location.pathname === '/login' || location.pathname.startsWith('/mobile')) {
     return null;
   }
 
