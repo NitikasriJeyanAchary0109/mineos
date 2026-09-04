@@ -25,6 +25,8 @@ import {
   Wifi,
   Flame,
   Activity,
+  Download,
+  Smartphone,
 } from 'lucide-react';
 import { isStandaloneMode, getMobileServerUrl, setMobileServerUrl, setStandaloneMode } from '../../services/mobileTelemetryBridge';
 
@@ -420,6 +422,21 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
                   {standaloneEnabled ? 'LOCAL' : 'SERVER'}
                 </span>
               </button>
+
+              <a
+                href="/MineOS.apk"
+                download="MineOS.apk"
+                onClick={() => setDrawerOpen(false)}
+                className="w-full px-3 py-2.5 rounded-xl border border-[#D4E8DF] bg-[#EAF3EF] text-[#176B4D] hover:bg-[#D4E8DF] active:bg-[#C2E0D4] flex items-center justify-between text-left transition-colors font-medium text-xs shadow-2xs"
+              >
+                <div className="flex items-center space-x-2.5">
+                  <Smartphone className="w-4 h-4 text-[#176B4D]" />
+                  <span className="font-bold text-[#176B4D]">Download Android APK</span>
+                </div>
+                <span className="text-[10px] font-mono bg-[#176B4D] text-white px-2 py-0.5 rounded-md font-bold">
+                  4.5 MB
+                </span>
+              </a>
 
               <button
                 onClick={() => {
