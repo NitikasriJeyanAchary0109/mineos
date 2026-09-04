@@ -10,13 +10,12 @@ import {
   AlertTriangle,
   Maximize2,
   Minimize2,
-  Radio,
 } from 'lucide-react';
 
 // =============================================================================
 // TIMELINE & SMOOTH INTERPOLATION UTILITIES
 // =============================================================================
-const CYCLE_DURATION = 18; // 18 seconds for buttery smooth playback
+const CYCLE_DURATION = 18; // 18 seconds for smooth cinematic playback
 
 // Cubic smoothstep easing
 function smoothstep(min: number, max: number, value: number): number {
@@ -43,7 +42,7 @@ export interface WorkerEntryProps {
 }
 
 // -----------------------------------------------------------------------------
-// 1. REALISTIC 3D MINER FIGURE WITH NATURAL STRIDE & COMPLETE INDUSTRIAL PPE
+// 1. HIGH-VISIBILITY 3D MINER FIGURE WITH NATURAL STRIDE & INDUSTRIAL PPE
 // -----------------------------------------------------------------------------
 interface WorkerModelProps {
   progress: number;
@@ -113,15 +112,15 @@ const AnimatedWorker: React.FC<WorkerModelProps> = ({
     progress > 0.65 ? 12.0 + (progress - 0.65) * 140 : Math.max(0, (1 - progress) * 25)
   ).toFixed(1);
 
-  // Scanning laser curtain elevation during Scene 2
-  const scanCurtainY = 0.25 + (Math.sin(progress * 38) * 0.5 + 0.5) * 1.85;
+  // Scanning laser curtain elevation during Scene 2 (smooth vertical sweep)
+  const scanCurtainY = 0.2 + (Math.sin(progress * 36) * 0.5 + 0.5) * 1.9;
 
   return (
     <group position={[workerX, 0, workerZ]}>
       {/* Soft Contact Disc Shadow Grounding Worker */}
       <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[0.55, 24]} />
-        <meshBasicMaterial color="#000000" transparent opacity={0.25} />
+        <circleGeometry args={[0.58, 24]} />
+        <meshBasicMaterial color="#000000" transparent opacity={0.3} />
       </mesh>
 
       {/* Ground Anchor Status Ring */}
@@ -135,65 +134,37 @@ const AnimatedWorker: React.FC<WorkerModelProps> = ({
         />
       </mesh>
 
-      {/* ==================== SCENE 2: BIOMETRIC SCANNING EFFECT ==================== */}
+      {/* ==================== SCENE 2: PHYSICAL SCANNING PROCESS BEAM ==================== */}
+      {/* Clearly visible emerald-green scanning laser curtain (NO NEON LABELS) */}
       {activeScene === 2 && (
         <group position={[0, 0, 0]}>
-          {/* Glowing emerald laser scan plane */}
+          {/* Sweeping Laser Plane */}
           <mesh position={[0, scanCurtainY, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[0.62, 0.72, 32]} />
-            <meshBasicMaterial color="#10B981" side={THREE.DoubleSide} transparent opacity={0.85} />
+            <planeGeometry args={[1.6, 0.2]} />
+            <meshBasicMaterial color="#2D8A61" side={THREE.DoubleSide} transparent opacity={0.85} />
           </mesh>
           <mesh position={[0, scanCurtainY, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <circleGeometry args={[0.62, 32]} />
-            <meshBasicMaterial color="#10B981" side={THREE.DoubleSide} transparent opacity={0.12} />
+            <planeGeometry args={[1.6, 0.9]} />
+            <meshBasicMaterial color="#2D8A61" side={THREE.DoubleSide} transparent opacity={0.28} />
           </mesh>
-
-          {/* Clean Dark Glassmorphic Identification Marker */}
-          <Html position={[0, 2.65, 0]} center distanceFactor={11}>
-            <div className="bg-[#111310]/85 border border-[#2DD4BF]/40 rounded-xl px-3.5 py-2.5 shadow-2xl backdrop-blur-md text-left font-mono min-w-[210px] select-none text-white animate-in fade-in zoom-in-95 duration-200">
-              <div className="flex items-center justify-between border-b border-white/15 pb-1 mb-1.5 text-[10px]">
-                <span className="font-bold text-[#2DD4BF] flex items-center space-x-1.5">
-                  <Radio className="w-3 h-3 text-[#2DD4BF] animate-pulse" />
-                  <span>ENTRY GATE SCAN</span>
-                </span>
-                <span className="text-[9px] text-[#A3A199]">PORTAL 01</span>
-              </div>
-              <div className="space-y-0.5 text-[10px]">
-                <div className="flex justify-between">
-                  <span className="text-[#A3A199]">WORKER ID:</span>
-                  <span className="font-bold text-white">MW-024</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#A3A199]">STATUS:</span>
-                  <span className="font-bold text-[#2DD4BF]">VERIFIED ✓</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#A3A199]">PPE:</span>
-                  <span className="font-bold text-[#2DD4BF]">COMPLIANT</span>
-                </div>
-                <div className="flex justify-between text-[9px] pt-1 border-t border-white/10 text-[#A3A199]">
-                  <span>LOCATION:</span>
-                  <span className="text-white">ENTRY GATE</span>
-                </div>
-              </div>
-            </div>
-          </Html>
+          {/* Ground Scanning Ripple Ring */}
+          <mesh position={[0, 0.025, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.65, 0.78, 32]} />
+            <meshBasicMaterial color="#2D8A61" side={THREE.DoubleSide} transparent opacity={0.7} />
+          </mesh>
         </group>
       )}
 
       {/* ==================== SCENE 4: EXACT WORKER LOCATION MARKER ==================== */}
       {activeScene === 4 && (
-        <Html position={[0, 2.7, 0]} center distanceFactor={13}>
-          <div className="bg-[#111310]/85 border border-[#2D8A61]/50 text-white rounded-xl px-3.5 py-2.5 shadow-2xl backdrop-blur-md font-mono text-left select-none whitespace-nowrap min-w-[200px]">
-            <div className="flex items-center space-x-2 text-[#2DD4BF] text-[11px] font-bold mb-0.5">
-              <span className="w-2 h-2 rounded-full bg-[#2DD4BF] animate-ping" />
-              <span>● MW-024</span>
+        <Html position={[0, 2.7, 0]} center distanceFactor={14}>
+          <div className="bg-[#151713]/90 border border-[#2D8A61]/60 text-white rounded-xl px-3.5 py-2 shadow-2xl backdrop-blur-md font-mono text-left select-none whitespace-nowrap">
+            <div className="flex items-center space-x-2 text-xs font-bold mb-0.5">
+              <span className="w-2 h-2 rounded-full bg-[#2D8A61] animate-pulse" />
+              <span className="text-white">● MW-024 · DEEPIKA</span>
             </div>
-            <div className="text-[10px] font-bold text-white tracking-wide">
-              LEVEL 2 // TUNNEL B-04
-            </div>
-            <div className="text-[9px] text-[#A3A199] mt-0.5">
-              {distanceFromJunction} m FROM JUNCTION
+            <div className="text-[10px] text-[#A3A199]">
+              LEVEL 2 // TUNNEL B-04 · {distanceFromJunction} m FROM JUNCTION
             </div>
           </div>
         </Html>
@@ -204,98 +175,84 @@ const AnimatedWorker: React.FC<WorkerModelProps> = ({
         <group position={[0, 0, 0]}>
           {/* Head & Helmet Holographic Wireframe Bracket */}
           <mesh position={[0, 1.95, 0]}>
-            <boxGeometry args={[0.54, 0.44, 0.54]} />
+            <boxGeometry args={[0.55, 0.45, 0.55]} />
             <meshBasicMaterial
               color={missingPpe ? '#A83D45' : '#2D8A61'}
               wireframe
               transparent
-              opacity={0.7}
+              opacity={0.8}
             />
           </mesh>
 
           {/* Torso & High-Vis Vest Bracket */}
           <mesh position={[0, 1.34, 0]}>
-            <boxGeometry args={[0.6, 0.72, 0.42]} />
-            <meshBasicMaterial color="#2D8A61" wireframe transparent opacity={0.5} />
+            <boxGeometry args={[0.62, 0.72, 0.44]} />
+            <meshBasicMaterial color="#2D8A61" wireframe transparent opacity={0.55} />
           </mesh>
 
           {/* Left & Right Protective Gloves Brackets */}
           <mesh position={[-0.38, 0.92, 0.02]}>
-            <boxGeometry args={[0.2, 0.24, 0.2]} />
-            <meshBasicMaterial color="#2D8A61" wireframe transparent opacity={0.5} />
+            <boxGeometry args={[0.22, 0.24, 0.22]} />
+            <meshBasicMaterial color="#2D8A61" wireframe transparent opacity={0.55} />
           </mesh>
           <mesh position={[0.38, 0.92, 0.02]}>
-            <boxGeometry args={[0.2, 0.24, 0.2]} />
-            <meshBasicMaterial color="#2D8A61" wireframe transparent opacity={0.5} />
+            <boxGeometry args={[0.22, 0.24, 0.22]} />
+            <meshBasicMaterial color="#2D8A61" wireframe transparent opacity={0.55} />
           </mesh>
 
           {/* Steel-Toe Boots Bracket */}
           <mesh position={[0, 0.14, 0.06]}>
-            <boxGeometry args={[0.62, 0.28, 0.52]} />
-            <meshBasicMaterial color="#2D8A61" wireframe transparent opacity={0.5} />
+            <boxGeometry args={[0.64, 0.3, 0.54]} />
+            <meshBasicMaterial color="#2D8A61" wireframe transparent opacity={0.55} />
           </mesh>
 
-          {/* Clean Dark Glassmorphic PPE Status Card */}
-          <Html position={[0, 2.75, 0]} center distanceFactor={12}>
-            <div className="bg-[#111310]/85 border border-[#2D8A61]/50 rounded-2xl p-3.5 shadow-2xl backdrop-blur-md text-left font-mono min-w-[210px] select-none text-white">
-              <div className="flex items-center justify-between border-b border-white/15 pb-1.5 mb-2">
-                <span className="text-[10px] font-bold text-white flex items-center space-x-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#2DD4BF]" />
-                  <span>3D PPE STATUS</span>
+          {/* Clean Minimal Dark Glassmorphic PPE Status Card */}
+          <Html position={[0, 2.75, 0]} center distanceFactor={14}>
+            <div className="bg-[#151713]/90 border border-[#2D8A61]/60 rounded-xl p-3 shadow-2xl backdrop-blur-md text-left font-mono min-w-[200px] select-none text-white">
+              <div className="flex items-center justify-between border-b border-white/15 pb-1 mb-1.5 text-[10px]">
+                <span className="font-bold text-white flex items-center space-x-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#2D8A61]" />
+                  <span>PPE TELEMETRY</span>
                 </span>
-                <span className="text-[9px] bg-white/10 text-[#A3A199] px-2 py-0.5 rounded-full border border-white/15 font-bold">
-                  MW-024
-                </span>
+                <span className="text-[9px] text-[#A3A199]">MW-024</span>
               </div>
 
               {/* Individual Item Badges */}
               <div className="space-y-1 text-[10px]">
                 {/* 1. HELMET */}
                 <div
-                  className={`flex items-center justify-between px-2 py-1 rounded-lg border transition-colors ${
+                  className={`flex items-center justify-between px-2 py-0.5 rounded transition-colors ${
                     missingPpe
-                      ? 'bg-[#A83D45]/30 border-[#A83D45] text-[#F87171] font-bold'
-                      : 'bg-[#2D8A61]/20 border-[#2D8A61]/40 text-[#2DD4BF] font-semibold'
+                      ? 'bg-[#A83D45]/30 text-[#F87171] font-bold border border-[#A83D45]'
+                      : 'bg-[#2D8A61]/20 text-[#4ADE80] font-semibold'
                   }`}
                 >
-                  <span className="flex items-center space-x-1.5">
-                    <span>{missingPpe ? '✗' : '✓'}</span>
-                    <span>HELMET</span>
-                  </span>
+                  <span>HELMET</span>
                   <span className="font-bold">{missingPpe ? 'MISSING' : 'OK'}</span>
                 </div>
 
                 {/* 2. REFLECTIVE VEST */}
-                <div className="flex items-center justify-between px-2 py-1 rounded-lg bg-[#2D8A61]/20 border border-[#2D8A61]/40 text-[#2DD4BF] font-semibold">
-                  <span className="flex items-center space-x-1.5">
-                    <span>✓</span>
-                    <span>SAFETY VEST</span>
-                  </span>
+                <div className="flex items-center justify-between px-2 py-0.5 rounded bg-[#2D8A61]/20 text-[#4ADE80] font-semibold">
+                  <span>SAFETY VEST</span>
                   <span className="font-bold">OK</span>
                 </div>
 
                 {/* 3. SAFETY BOOTS */}
-                <div className="flex items-center justify-between px-2 py-1 rounded-lg bg-[#2D8A61]/20 border border-[#2D8A61]/40 text-[#2DD4BF] font-semibold">
-                  <span className="flex items-center space-x-1.5">
-                    <span>✓</span>
-                    <span>BOOTS</span>
-                  </span>
+                <div className="flex items-center justify-between px-2 py-0.5 rounded bg-[#2D8A61]/20 text-[#4ADE80] font-semibold">
+                  <span>BOOTS</span>
                   <span className="font-bold">OK</span>
                 </div>
 
                 {/* 4. PROTECTIVE GLOVES */}
-                <div className="flex items-center justify-between px-2 py-1 rounded-lg bg-[#2D8A61]/20 border border-[#2D8A61]/40 text-[#2DD4BF] font-semibold">
-                  <span className="flex items-center space-x-1.5">
-                    <span>✓</span>
-                    <span>GLOVES</span>
-                  </span>
+                <div className="flex items-center justify-between px-2 py-0.5 rounded bg-[#2D8A61]/20 text-[#4ADE80] font-semibold">
+                  <span>GLOVES</span>
                   <span className="font-bold">OK</span>
                 </div>
               </div>
 
               {/* Statutory Missing PPE Warning Alert */}
               {missingPpe && (
-                <div className="mt-2 p-2 rounded-xl bg-[#A83D45] text-white text-[10px] font-sans font-semibold flex items-center space-x-1.5 shadow-sm animate-pulse">
+                <div className="mt-2 p-1.5 rounded-lg bg-[#A83D45] text-white text-[10px] font-sans font-semibold flex items-center space-x-1.5 shadow-sm animate-pulse">
                   <AlertTriangle className="w-3.5 h-3.5 text-white shrink-0" />
                   <div>
                     <div className="font-bold">⚠ PPE ALERT</div>
@@ -356,10 +313,10 @@ const AnimatedWorker: React.FC<WorkerModelProps> = ({
           <meshStandardMaterial color="#334155" metalness={0.7} />
         </mesh>
 
-        {/* Torso & High-Vis Orange Safety Vest */}
+        {/* Torso & Vibrant Safety Orange Vest */}
         <mesh position={[0, 1.34, 0]}>
           <boxGeometry args={[0.48, 0.65, 0.32]} />
-          <meshStandardMaterial color="#ea580c" roughness={0.5} />
+          <meshStandardMaterial color="#ea580c" roughness={0.45} />
         </mesh>
 
         {/* Dual Silver Reflective Stripes */}
@@ -440,7 +397,7 @@ const AnimatedWorker: React.FC<WorkerModelProps> = ({
             <spotLight
               position={[0, 0.02, 0.28]}
               target-position={[0, -0.4, 5.0]}
-              intensity={1.4}
+              intensity={1.5}
               distance={9}
               angle={0.42}
               penumbra={0.3}
@@ -480,10 +437,10 @@ const BreadcrumbTrail: React.FC<BreadcrumbTrailProps> = ({ progress, activeScene
     <group>
       {currentPoints.map((pt, i) => (
         <group key={i} position={[pt[0], pt[1], pt[2]]}>
-          {/* Subtle Glowing Dot */}
+          {/* Subtle Warm Amber/Green Ground Marker */}
           <mesh rotation={[-Math.PI / 2, 0, 0]}>
-            <circleGeometry args={[0.08, 16]} />
-            <meshBasicMaterial color="#2DD4BF" />
+            <circleGeometry args={[0.09, 16]} />
+            <meshBasicMaterial color="#2D8A61" />
           </mesh>
           {/* Connecting Trail Line */}
           {i < currentPoints.length - 1 && (
@@ -495,8 +452,8 @@ const BreadcrumbTrail: React.FC<BreadcrumbTrailProps> = ({ progress, activeScene
               ]}
               rotation={[-Math.PI / 2, 0, 0]}
             >
-              <planeGeometry args={[0.035, Math.abs(currentPoints[i + 1][2] - pt[2])]} />
-              <meshBasicMaterial color="#2DD4BF" transparent opacity={0.45} />
+              <planeGeometry args={[0.04, Math.abs(currentPoints[i + 1][2] - pt[2])]} />
+              <meshBasicMaterial color="#2D8A61" transparent opacity={0.4} />
             </mesh>
           )}
         </group>
@@ -506,9 +463,11 @@ const BreadcrumbTrail: React.FC<BreadcrumbTrailProps> = ({ progress, activeScene
 };
 
 // -----------------------------------------------------------------------------
-// 3. REALISTIC SURFACE MINE PORTAL & ADIT ENTRANCE (Scene 1 & 2)
+// 3. REALISTIC SURFACE MINE PORTAL & PHYSICAL SCANNING ARCH (Scene 1 & 2)
 // -----------------------------------------------------------------------------
-const MineEntrancePortal: React.FC = () => {
+const MineEntrancePortal: React.FC<{ progress: number }> = ({ progress }) => {
+  const isScanning = progress >= 0.2 && progress < 0.38;
+
   return (
     <group position={[0, 0, 2.5]}>
       {/* Terraced Hillside Sandstone & Shale Outcrop Strata */}
@@ -552,37 +511,79 @@ const MineEntrancePortal: React.FC = () => {
         <meshStandardMaterial color="#facc15" roughness={0.4} />
       </mesh>
 
-      {/* Overhead Entry Luminaire */}
-      <pointLight position={[0, 3.4, 0.45]} intensity={1.8} distance={8} color="#FFF8E7" />
+      {/* Overhead Entry Luminaire casting light on entrance */}
+      <pointLight position={[0, 3.4, 0.45]} intensity={2.0} distance={8} color="#FFF8E7" />
       <mesh position={[0, 3.45, 0.25]}>
         <cylinderGeometry args={[0.1, 0.1, 0.12, 12]} />
         <meshBasicMaterial color="#FFF8E7" />
       </mesh>
 
-      {/* Access Gate Stanchions & Turnstiles at z = -0.6 (World z = 1.9) */}
-      <group position={[0, 0, -0.6]}>
-        <mesh position={[-1.1, 0.6, 0]}>
-          <cylinderGeometry args={[0.06, 0.06, 1.2, 12]} />
-          <meshStandardMaterial color="#334155" metalness={0.8} />
+      {/* ================= PHYSICAL BIOMETRIC SCANNING ARCH (z = -0.5, World z = 2.0) ================= */}
+      <group position={[0, 0, -0.5]}>
+        {/* Left Yellow/Steel Scanner Tower */}
+        <mesh position={[-1.2, 1.25, 0]}>
+          <boxGeometry args={[0.14, 2.5, 0.18]} />
+          <meshStandardMaterial color="#EAB308" metalness={0.4} roughness={0.4} />
         </mesh>
-        <mesh position={[-1.1, 1.25, 0]}>
-          <boxGeometry args={[0.18, 0.22, 0.14]} />
-          <meshStandardMaterial color="#176B4D" />
-        </mesh>
-
-        <mesh position={[1.1, 0.6, 0]}>
-          <cylinderGeometry args={[0.06, 0.06, 1.2, 12]} />
-          <meshStandardMaterial color="#334155" metalness={0.8} />
-        </mesh>
-        <mesh position={[1.1, 1.25, 0]}>
-          <boxGeometry args={[0.18, 0.22, 0.14]} />
-          <meshStandardMaterial color="#176B4D" />
+        {/* Left Sensor Optics Array */}
+        <mesh position={[-1.12, 1.3, 0]}>
+          <boxGeometry args={[0.04, 1.8, 0.08]} />
+          <meshStandardMaterial color="#0F172A" roughness={0.2} metalness={0.8} />
         </mesh>
 
-        {/* Floor Entry Demarcation Strip */}
-        <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[2.0, 0.1]} />
-          <meshBasicMaterial color="#facc15" />
+        {/* Right Yellow/Steel Scanner Tower */}
+        <mesh position={[1.2, 1.25, 0]}>
+          <boxGeometry args={[0.14, 2.5, 0.18]} />
+          <meshStandardMaterial color="#EAB308" metalness={0.4} roughness={0.4} />
+        </mesh>
+        {/* Right Sensor Optics Array */}
+        <mesh position={[1.12, 1.3, 0]}>
+          <boxGeometry args={[0.04, 1.8, 0.08]} />
+          <meshStandardMaterial color="#0F172A" roughness={0.2} metalness={0.8} />
+        </mesh>
+
+        {/* Overhead Scanner Cross-Gantry */}
+        <mesh position={[0, 2.45, 0]}>
+          <boxGeometry args={[2.54, 0.16, 0.22]} />
+          <meshStandardMaterial color="#334155" metalness={0.7} />
+        </mesh>
+
+        {/* Dedicated Scanner Downward Light Beam */}
+        {isScanning && (
+          <spotLight
+            position={[0, 2.4, 0]}
+            target-position={[0, 0, 0]}
+            intensity={2.8}
+            distance={4.5}
+            angle={0.5}
+            penumbra={0.4}
+            color="#2D8A61"
+          />
+        )}
+
+        {/* Status Beacon Indicator on Top of Towers (Amber -> Green on pass) */}
+        <mesh position={[-1.2, 2.6, 0]}>
+          <sphereGeometry args={[0.07, 12, 12]} />
+          <meshBasicMaterial color={isScanning ? '#2D8A61' : '#F59E0B'} />
+        </mesh>
+        <mesh position={[1.2, 2.6, 0]}>
+          <sphereGeometry args={[0.07, 12, 12]} />
+          <meshBasicMaterial color={isScanning ? '#2D8A61' : '#F59E0B'} />
+        </mesh>
+
+        {/* Ground Scanner Floor Plate */}
+        <mesh position={[0, 0.018, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[2.2, 1.2]} />
+          <meshStandardMaterial color="#1E293B" roughness={0.7} metalness={0.4} />
+        </mesh>
+        {/* Floor Guidance Stripes */}
+        <mesh position={[-0.9, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.08, 1.1]} />
+          <meshBasicMaterial color="#EAB308" />
+        </mesh>
+        <mesh position={[0.9, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.08, 1.1]} />
+          <meshBasicMaterial color="#EAB308" />
         </mesh>
       </group>
     </group>
@@ -596,7 +597,7 @@ const DigitalTwinMineNetwork: React.FC = () => {
   return (
     <group>
       {/* CAD Ground Grid */}
-      <gridHelper args={[70, 70, '#D1CFCA', '#E4E2DC']} position={[0, -0.05, -10]} />
+      <gridHelper args={[80, 80, '#D1CFCA', '#E4E2DC']} position={[0, -0.05, -10]} />
 
       {/* Main Vaulted Haulage Drift (z: 2 to -26) */}
       <group position={[0, 0, -10]}>
@@ -654,7 +655,7 @@ const DigitalTwinMineNetwork: React.FC = () => {
             </mesh>
 
             {/* Ceiling Industrial LED Bulkhead Lamp */}
-            <pointLight position={[0, 2.9, 0]} intensity={0.75} distance={7} color="#FFF5EB" />
+            <pointLight position={[0, 2.9, 0]} intensity={0.9} distance={8} color="#FFF5EB" />
             <mesh position={[0, 2.95, 0]}>
               <sphereGeometry args={[0.07, 10, 10]} />
               <meshBasicMaterial color="#ffffff" />
@@ -736,7 +737,7 @@ const DigitalTwinMineNetwork: React.FC = () => {
 };
 
 // -----------------------------------------------------------------------------
-// 5. CINEMATIC CAMERA CONTROLLER WITH SMOOTHSTEP CONTINUOUS INTERPOLATION
+// 5. CINEMATIC CAMERA CONTROLLER (ZOOMED OUT PERSPECTIVES ACROSS ALL SCENES)
 // -----------------------------------------------------------------------------
 interface CameraControllerProps {
   progress: number;
@@ -748,29 +749,29 @@ const CameraController: React.FC<CameraControllerProps> = ({ progress }) => {
     let targetLook: [number, number, number];
 
     if (progress < 0.2) {
-      // Scene 1: Outside entrance, following approaching worker
+      // Scene 1: Outside entrance, elevated comfortable approach angle
       const t = smoothstep(0, 0.2, progress);
-      targetPos = vLerp([2.2, 1.8, 9.5], [1.8, 1.85, 6.2], t);
-      targetLook = vLerp([0, 1.3, 4.5], [0, 1.35, 2.8], t);
+      targetPos = vLerp([4.2, 3.2, 11.5], [3.5, 2.8, 8.5], t);
+      targetLook = vLerp([0, 1.2, 5.0], [0, 1.3, 3.2], t);
     } else if (progress < 0.38) {
-      // Scene 2: Entry Turnstile Gate Verification
+      // Scene 2: Entry Gate & Physical Scanning Process (Framed to see full worker + arch)
       const t = smoothstep(0.2, 0.38, progress);
-      targetPos = vLerp([1.8, 1.85, 6.2], [1.7, 1.85, 3.6], t);
-      targetLook = vLerp([0, 1.35, 2.8], [0, 1.35, 1.4], t);
+      targetPos = vLerp([3.5, 2.8, 8.5], [3.2, 2.4, 6.2], t);
+      targetLook = vLerp([0, 1.3, 3.2], [0, 1.3, 2.0], t);
     } else if (progress < 0.65) {
-      // Scene 3: Pull back & elevate into MineOS Digital Twin isometric overview
+      // Scene 3: Digital Twin Overview (ZOOMED OUT to reveal the entire subterranean mine!)
       const t = smoothstep(0.38, 0.65, progress);
-      targetPos = vLerp([1.7, 1.85, 3.6], [5.8, 6.2, -4.5], t);
-      targetLook = vLerp([0, 1.35, 1.4], [-1.2, 1.0, -6.5], t);
+      targetPos = vLerp([3.2, 2.4, 6.2], [11.0, 14.5, -3.5], t);
+      targetLook = vLerp([0, 1.3, 2.0], [-1.5, 0.5, -8.5], t);
     } else if (progress < 0.84) {
-      // Scene 4: Zoom into exact worker location in Tunnel B-04
+      // Scene 4: Exact Worker Location in Tunnel B-04 (ZOOMED OUT with ample context)
       const t = smoothstep(0.65, 0.84, progress);
-      targetPos = vLerp([5.8, 6.2, -4.5], [1.5, 2.1, -9.2], t);
-      targetLook = vLerp([-1.2, 1.0, -6.5], [0.1, 1.35, -11.5], t);
+      targetPos = vLerp([11.0, 14.5, -3.5], [4.8, 4.2, -7.5], t);
+      targetLook = vLerp([-1.5, 0.5, -8.5], [0, 1.1, -11.5], t);
     } else {
-      // Scene 5: Close-up 3D Holographic PPE Status Inspection
-      targetPos = [1.2, 1.75, -9.5];
-      targetLook = [0, 1.4, -12.0];
+      // Scene 5: Holographic PPE Inspection (ZOOMED OUT to frame full worker comfortably)
+      targetPos = [3.2, 2.8, -8.0];
+      targetLook = [0, 1.3, -12.0];
     }
 
     const tVec = new THREE.Vector3(...targetPos);
@@ -844,23 +845,23 @@ export const WorkerEntryDigitalTwinAnimation: React.FC<WorkerEntryProps> = ({
       >
         <Canvas
           shadows
-          camera={{ position: [2.2, 1.8, 9.5], fov: 42 }}
+          camera={{ position: [4.2, 3.2, 11.5], fov: 48 }}
           gl={{ antialias: true, alpha: false }}
         >
           {/* Light Industrial Engineering CAD Background */}
           <color attach="background" args={['#F6F5F1']} />
-          <fog attach="fog" args={['#F6F5F1', 18, 55]} />
+          <fog attach="fog" args={['#F6F5F1', 25, 75]} />
 
-          {/* Environmental Illumination */}
-          <ambientLight intensity={0.85} />
-          <directionalLight position={[10, 15, 12]} intensity={1.1} castShadow />
-          <directionalLight position={[-8, 6, -8]} intensity={0.4} color="#CBD5E1" />
+          {/* Environmental Illumination for crisp visibility */}
+          <ambientLight intensity={1.1} />
+          <directionalLight position={[12, 18, 14]} intensity={1.3} castShadow />
+          <directionalLight position={[-10, 10, -8]} intensity={0.6} color="#E2E8F0" />
 
           {/* Smoothstep Cinematic Camera Controller */}
           <CameraController progress={progress} />
 
-          {/* Surface Portal & Access Adit (Scene 1 & 2) */}
-          <MineEntrancePortal />
+          {/* Surface Portal & Access Adit with Physical Scanner Arch (Scene 1 & 2) */}
+          <MineEntrancePortal progress={progress} />
 
           {/* Vaulted 3D Digital Twin Mine Network (Scene 3, 4, 5) */}
           <DigitalTwinMineNetwork />
@@ -877,9 +878,9 @@ export const WorkerEntryDigitalTwinAnimation: React.FC<WorkerEntryProps> = ({
           />
         </Canvas>
 
-        {/* Discreet Top-Left Scene Pill */}
+        {/* Discreet Top-Left Scene Pill (NO NEON) */}
         <div className="absolute top-3 left-3 bg-[#111310]/75 backdrop-blur-md border border-white/10 rounded-lg px-2.5 py-1 shadow-xs font-mono flex items-center space-x-2 pointer-events-none">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#2DD4BF] animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#2D8A61]" />
           <span className="text-[10px] font-bold text-white tracking-wider">
             {activeScene === 1 && 'SCENE 1 // MINE ENTRANCE'}
             {activeScene === 2 && 'SCENE 2 // IDENTIFICATION SCAN'}
@@ -901,7 +902,7 @@ export const WorkerEntryDigitalTwinAnimation: React.FC<WorkerEntryProps> = ({
             className={`px-2 py-1 rounded-lg text-[10px] font-mono font-bold border backdrop-blur-md transition-all shadow-xs ${
               missingPpe
                 ? 'bg-[#A83D45]/90 border-[#A83D45] text-white'
-                : 'bg-[#111310]/75 border-white/10 text-[#2DD4BF] hover:bg-[#111310]/90'
+                : 'bg-[#111310]/75 border-white/10 text-white/90 hover:bg-[#111310]/90'
             }`}
             title="Toggle between Nominal 100% PPE and Alert State"
           >
