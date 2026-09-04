@@ -581,38 +581,6 @@ export const MineDigitalTwin: React.FC<MineDigitalTwinProps> = ({
         fullScreen ? 'h-[calc(100vh-140px)]' : 'h-[480px]'
       } bg-[#F6F5F1] rounded-2xl overflow-hidden border border-[#DCDAD4] shadow-sm flex flex-col`}
     >
-      {/* ==================== TOP FLOATING ZONE SELECTOR BUTTONS (ALL, ZONE A, ZONE B, ZONE C, ZONE D) ==================== */}
-      <div className="absolute top-3 left-3 z-20 flex flex-wrap items-center gap-1.5 pointer-events-auto bg-white/95 backdrop-blur-md p-1.5 rounded-2xl border border-[#DCDAD4] shadow-sm">
-        <button
-          type="button"
-          onClick={resetToOverview}
-          className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all shadow-xs ${
-            activeZoneId === 'all'
-              ? 'bg-[#176B4D] text-white'
-              : 'bg-white hover:bg-[#FAF9F6] text-[#151713] border border-[#ECEBE6]'
-          }`}
-        >
-          ALL
-        </button>
-        {zones.map((zone) => {
-          const isZoneActive = activeZoneId === zone.id;
-          const label = zone.shortCode || zone.name.split('—')[0].trim().toUpperCase();
-          return (
-            <button
-              key={zone.id}
-              type="button"
-              onClick={() => focusZone(zone.coordinates, zone.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all shadow-xs ${
-                isZoneActive
-                  ? 'bg-[#176B4D] text-white'
-                  : 'bg-white hover:bg-[#FAF9F6] text-[#151713] border border-[#ECEBE6]'
-              }`}
-            >
-              {label}
-            </button>
-          );
-        })}
-      </div>
 
       {/* ==================== MINIMAL BOTTOM LEGEND ONLY ==================== */}
       <div className="absolute bottom-3 left-3 right-3 flex flex-wrap items-center justify-between gap-2 z-20 pointer-events-none">
