@@ -15,7 +15,7 @@ import {
 // =============================================================================
 // TIMELINE & SMOOTH INTERPOLATION UTILITIES
 // =============================================================================
-const CYCLE_DURATION = 18; // 18 seconds for smooth cinematic playback
+const CYCLE_DURATION = 18; // 18 seconds for smooth cinematic pacing
 
 // Cubic smoothstep easing
 function smoothstep(min: number, max: number, value: number): number {
@@ -140,24 +140,24 @@ const AnimatedWorker: React.FC<WorkerModelProps> = ({
         <group position={[0, 0, 0]}>
           {/* Sweeping Laser Plane */}
           <mesh position={[0, scanCurtainY, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[1.6, 0.2]} />
-            <meshBasicMaterial color="#2D8A61" side={THREE.DoubleSide} transparent opacity={0.85} />
+            <planeGeometry args={[2.0, 0.25]} />
+            <meshBasicMaterial color="#2D8A61" side={THREE.DoubleSide} transparent opacity={0.9} />
           </mesh>
           <mesh position={[0, scanCurtainY, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[1.6, 0.9]} />
-            <meshBasicMaterial color="#2D8A61" side={THREE.DoubleSide} transparent opacity={0.28} />
+            <planeGeometry args={[2.0, 1.1]} />
+            <meshBasicMaterial color="#2D8A61" side={THREE.DoubleSide} transparent opacity={0.35} />
           </mesh>
           {/* Ground Scanning Ripple Ring */}
           <mesh position={[0, 0.025, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[0.65, 0.78, 32]} />
-            <meshBasicMaterial color="#2D8A61" side={THREE.DoubleSide} transparent opacity={0.7} />
+            <ringGeometry args={[0.5, 0.85, 32]} />
+            <meshBasicMaterial color="#2D8A61" side={THREE.DoubleSide} transparent opacity={0.8} />
           </mesh>
         </group>
       )}
 
       {/* ==================== SCENE 4: EXACT WORKER LOCATION MARKER ==================== */}
       {activeScene === 4 && (
-        <Html position={[0, 2.7, 0]} center distanceFactor={14}>
+        <Html position={[0, 2.8, 0]} center distanceFactor={16}>
           <div className="bg-[#151713]/90 border border-[#2D8A61]/60 text-white rounded-xl px-3.5 py-2 shadow-2xl backdrop-blur-md font-mono text-left select-none whitespace-nowrap">
             <div className="flex items-center space-x-2 text-xs font-bold mb-0.5">
               <span className="w-2 h-2 rounded-full bg-[#2D8A61] animate-pulse" />
@@ -207,7 +207,7 @@ const AnimatedWorker: React.FC<WorkerModelProps> = ({
           </mesh>
 
           {/* Clean Minimal Dark Glassmorphic PPE Status Card */}
-          <Html position={[0, 2.75, 0]} center distanceFactor={14}>
+          <Html position={[0, 2.9, 0]} center distanceFactor={16}>
             <div className="bg-[#151713]/90 border border-[#2D8A61]/60 rounded-xl p-3 shadow-2xl backdrop-blur-md text-left font-mono min-w-[200px] select-none text-white">
               <div className="flex items-center justify-between border-b border-white/15 pb-1 mb-1.5 text-[10px]">
                 <span className="font-bold text-white flex items-center space-x-1.5">
@@ -397,8 +397,8 @@ const AnimatedWorker: React.FC<WorkerModelProps> = ({
             <spotLight
               position={[0, 0.02, 0.28]}
               target-position={[0, -0.4, 5.0]}
-              intensity={1.5}
-              distance={9}
+              intensity={1.6}
+              distance={10}
               angle={0.42}
               penumbra={0.3}
               color="#ffffff"
@@ -463,45 +463,43 @@ const BreadcrumbTrail: React.FC<BreadcrumbTrailProps> = ({ progress, activeScene
 };
 
 // -----------------------------------------------------------------------------
-// 3. REALISTIC SURFACE MINE PORTAL & PHYSICAL SCANNING ARCH (Scene 1 & 2)
+// 3. ARCHITECTURAL CUTAWAY SURFACE PORTAL & PHYSICAL SCANNING ARCH (Scene 1 & 2)
+// (Viewer-side front black/brown walls removed for 100% unobstructed visibility)
 // -----------------------------------------------------------------------------
 const MineEntrancePortal: React.FC<{ progress: number }> = ({ progress }) => {
   const isScanning = progress >= 0.2 && progress < 0.38;
 
   return (
     <group position={[0, 0, 2.5]}>
-      {/* Terraced Hillside Sandstone & Shale Outcrop Strata */}
-      <mesh position={[-4.0, 2.6, 0]}>
-        <boxGeometry args={[4.8, 5.8, 1.8]} />
-        <meshStandardMaterial color="#4A443E" roughness={0.95} />
-      </mesh>
-      <mesh position={[4.0, 2.6, 0]}>
-        <boxGeometry args={[4.8, 5.8, 1.8]} />
+      {/* Terraced Hillside Sandstone Strata (Back Wall only, x < 0) */}
+      <mesh position={[-3.8, 2.6, 0]}>
+        <boxGeometry args={[4.4, 5.8, 1.8]} />
         <meshStandardMaterial color="#4A443E" roughness={0.95} />
       </mesh>
       {/* Portal Overhead Crown Strata */}
-      <mesh position={[0, 4.6, 0]}>
-        <boxGeometry args={[4.6, 2.2, 1.8]} />
+      <mesh position={[-0.8, 4.6, 0]}>
+        <boxGeometry args={[4.2, 2.2, 1.8]} />
         <meshStandardMaterial color="#3F3934" roughness={0.95} />
       </mesh>
 
-      {/* Surface Approach Ground with Road Surface */}
+      {/* Surface Approach Ground */}
       <mesh position={[0, -0.05, 5]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[14, 10]} />
         <meshStandardMaterial color="#7E7568" roughness={0.9} />
       </mesh>
 
-      {/* Heavy Timber Portal Framing with Steel Gussets */}
+      {/* Heavy Timber Portal Framing: Left Pillar & Lintel; Cutaway Base on Viewer Side */}
       <mesh position={[-1.75, 1.8, 0.1]}>
         <boxGeometry args={[0.32, 3.8, 0.32]} />
         <meshStandardMaterial color="#2A1810" roughness={0.85} />
       </mesh>
-      <mesh position={[1.75, 1.8, 0.1]}>
-        <boxGeometry args={[0.32, 3.8, 0.32]} />
+      {/* Right Cutaway Timber Footer (Never obstructs line of sight into scan) */}
+      <mesh position={[1.75, 0.3, 0.1]}>
+        <boxGeometry args={[0.32, 0.6, 0.32]} />
         <meshStandardMaterial color="#2A1810" roughness={0.85} />
       </mesh>
-      <mesh position={[0, 3.65, 0.1]}>
-        <boxGeometry args={[3.8, 0.35, 0.32]} />
+      <mesh position={[-0.3, 3.65, 0.1]}>
+        <boxGeometry args={[3.2, 0.35, 0.32]} />
         <meshStandardMaterial color="#2A1810" roughness={0.85} />
       </mesh>
 
@@ -511,8 +509,8 @@ const MineEntrancePortal: React.FC<{ progress: number }> = ({ progress }) => {
         <meshStandardMaterial color="#facc15" roughness={0.4} />
       </mesh>
 
-      {/* Overhead Entry Luminaire casting light on entrance */}
-      <pointLight position={[0, 3.4, 0.45]} intensity={2.0} distance={8} color="#FFF8E7" />
+      {/* Overhead Entry Luminaire casting light directly on entrance */}
+      <pointLight position={[0, 3.4, 0.45]} intensity={2.5} distance={9} color="#FFF8E7" />
       <mesh position={[0, 3.45, 0.25]}>
         <cylinderGeometry args={[0.1, 0.1, 0.12, 12]} />
         <meshBasicMaterial color="#FFF8E7" />
@@ -548,20 +546,20 @@ const MineEntrancePortal: React.FC<{ progress: number }> = ({ progress }) => {
           <meshStandardMaterial color="#334155" metalness={0.7} />
         </mesh>
 
-        {/* Dedicated Scanner Downward Light Beam */}
+        {/* Dedicated Scanner Downward Light Beam (Emerald Green) */}
         {isScanning && (
           <spotLight
             position={[0, 2.4, 0]}
             target-position={[0, 0, 0]}
-            intensity={2.8}
-            distance={4.5}
-            angle={0.5}
+            intensity={3.2}
+            distance={5}
+            angle={0.52}
             penumbra={0.4}
             color="#2D8A61"
           />
         )}
 
-        {/* Status Beacon Indicator on Top of Towers (Amber -> Green on pass) */}
+        {/* Status Beacon Indicator on Top of Towers (Amber -> Green on verified) */}
         <mesh position={[-1.2, 2.6, 0]}>
           <sphereGeometry args={[0.07, 12, 12]} />
           <meshBasicMaterial color={isScanning ? '#2D8A61' : '#F59E0B'} />
@@ -591,7 +589,8 @@ const MineEntrancePortal: React.FC<{ progress: number }> = ({ progress }) => {
 };
 
 // -----------------------------------------------------------------------------
-// 4. VAULTED UNDERGROUND MINE NETWORK & DIGITAL TWIN (Scene 3, 4, 5)
+// 4. ARCHITECTURAL CUTAWAY UNDERGROUND MINE NETWORK & DIGITAL TWIN
+// (Viewer-side front black wall cut down to low curb so worker is never hidden)
 // -----------------------------------------------------------------------------
 const DigitalTwinMineNetwork: React.FC = () => {
   return (
@@ -625,13 +624,15 @@ const DigitalTwinMineNetwork: React.FC = () => {
           <meshStandardMaterial color="#64748B" metalness={0.85} roughness={0.3} />
         </mesh>
 
-        {/* Textured Coal Rib Walls */}
+        {/* Solid Back Coal Rib Wall (x = -1.75, backdrop) */}
         <mesh position={[-1.75, 1.5, 0]}>
           <boxGeometry args={[0.2, 3.0, 32]} />
           <meshStandardMaterial color="#1C2026" roughness={0.95} />
         </mesh>
-        <mesh position={[1.75, 1.5, 0]}>
-          <boxGeometry args={[0.2, 3.0, 32]} />
+
+        {/* Low Architectural Cutaway Curb on Viewer Side (x = 1.75, height 0.12 so it NEVER hides the worker!) */}
+        <mesh position={[1.75, 0.06, 0]}>
+          <boxGeometry args={[0.2, 0.12, 32]} />
           <meshStandardMaterial color="#1C2026" roughness={0.95} />
         </mesh>
 
@@ -643,38 +644,38 @@ const DigitalTwinMineNetwork: React.FC = () => {
               <cylinderGeometry args={[0.055, 0.055, 3.0, 10]} />
               <meshStandardMaterial color="#334155" metalness={0.7} />
             </mesh>
-            {/* Right Column Leg */}
-            <mesh position={[1.6, 1.5, 0]}>
-              <cylinderGeometry args={[0.055, 0.055, 3.0, 10]} />
+            {/* Right Column Baseplate Footing (Architectural cutaway - zero obstruction) */}
+            <mesh position={[1.6, 0.08, 0]}>
+              <cylinderGeometry args={[0.08, 0.08, 0.16, 10]} />
               <meshStandardMaterial color="#334155" metalness={0.7} />
             </mesh>
-            {/* Curved Overhead Arch Crossbeam */}
-            <mesh position={[0, 3.05, 0]} rotation={[0, 0, Math.PI / 2]}>
-              <cylinderGeometry args={[0.055, 0.055, 3.2, 10]} />
+            {/* Overhead Arch Canopy */}
+            <mesh position={[-0.4, 3.05, 0]} rotation={[0, 0, Math.PI / 2]}>
+              <cylinderGeometry args={[0.055, 0.055, 2.4, 10]} />
               <meshStandardMaterial color="#334155" metalness={0.7} />
             </mesh>
 
             {/* Ceiling Industrial LED Bulkhead Lamp */}
-            <pointLight position={[0, 2.9, 0]} intensity={0.9} distance={8} color="#FFF5EB" />
-            <mesh position={[0, 2.95, 0]}>
+            <pointLight position={[-0.4, 2.9, 0]} intensity={1.1} distance={9} color="#FFF5EB" />
+            <mesh position={[-0.4, 2.95, 0]}>
               <sphereGeometry args={[0.07, 10, 10]} />
               <meshBasicMaterial color="#ffffff" />
             </mesh>
           </group>
         ))}
 
-        {/* Overhead Flexible Yellow Ventilation Bag along Tunnel Crown */}
+        {/* Overhead Flexible Yellow Ventilation Bag along Tunnel Crown (x = -0.85) */}
         <mesh position={[-0.85, 2.65, 0]} rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.24, 0.24, 32, 14]} />
           <meshStandardMaterial color="#EAB308" roughness={0.5} />
         </mesh>
 
-        {/* Utility Pipeline Service Rack along Right Wall */}
-        <mesh position={[1.6, 1.2, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        {/* Utility Pipeline Service Rack along Back Wall */}
+        <mesh position={[-1.6, 1.2, 0]} rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.04, 0.04, 32, 8]} />
           <meshStandardMaterial color="#FACC15" metalness={0.5} />
         </mesh>
-        <mesh position={[1.6, 1.0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <mesh position={[-1.6, 1.0, 0]} rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.04, 0.04, 32, 8]} />
           <meshStandardMaterial color="#2563EB" metalness={0.5} />
         </mesh>
@@ -687,10 +688,6 @@ const DigitalTwinMineNetwork: React.FC = () => {
           <meshStandardMaterial color="#181B1F" roughness={0.95} />
         </mesh>
         <mesh position={[0, 1.3, -1.45]}>
-          <boxGeometry args={[10, 2.6, 0.15]} />
-          <meshStandardMaterial color="#1C2026" />
-        </mesh>
-        <mesh position={[0, 1.3, 1.45]}>
           <boxGeometry args={[10, 2.6, 0.15]} />
           <meshStandardMaterial color="#1C2026" />
         </mesh>
@@ -749,29 +746,29 @@ const CameraController: React.FC<CameraControllerProps> = ({ progress }) => {
     let targetLook: [number, number, number];
 
     if (progress < 0.2) {
-      // Scene 1: Outside entrance, elevated comfortable approach angle
+      // Scene 1: Outside entrance, comfortable wide approach (ZOOMED OUT)
       const t = smoothstep(0, 0.2, progress);
-      targetPos = vLerp([4.2, 3.2, 11.5], [3.5, 2.8, 8.5], t);
-      targetLook = vLerp([0, 1.2, 5.0], [0, 1.3, 3.2], t);
+      targetPos = vLerp([8.0, 5.5, 16.5], [6.5, 4.4, 12.0], t);
+      targetLook = vLerp([0, 1.2, 4.5], [0, 1.3, 2.5], t);
     } else if (progress < 0.38) {
-      // Scene 2: Entry Gate & Physical Scanning Process (Framed to see full worker + arch)
+      // Scene 2: Entry Gate & Physical Scanning Process (ZOOMED OUT & 100% UNOBSTRUCTED)
       const t = smoothstep(0.2, 0.38, progress);
-      targetPos = vLerp([3.5, 2.8, 8.5], [3.2, 2.4, 6.2], t);
-      targetLook = vLerp([0, 1.3, 3.2], [0, 1.3, 2.0], t);
+      targetPos = vLerp([6.5, 4.4, 12.0], [5.8, 4.0, 9.0], t);
+      targetLook = vLerp([0, 1.3, 2.5], [0, 1.3, 1.8], t);
     } else if (progress < 0.65) {
       // Scene 3: Digital Twin Overview (ZOOMED OUT to reveal the entire subterranean mine!)
       const t = smoothstep(0.38, 0.65, progress);
-      targetPos = vLerp([3.2, 2.4, 6.2], [11.0, 14.5, -3.5], t);
-      targetLook = vLerp([0, 1.3, 2.0], [-1.5, 0.5, -8.5], t);
+      targetPos = vLerp([5.8, 4.0, 9.0], [17.5, 22.5, -3.0], t);
+      targetLook = vLerp([0, 1.3, 1.8], [-2.0, 0, -9.0], t);
     } else if (progress < 0.84) {
-      // Scene 4: Exact Worker Location in Tunnel B-04 (ZOOMED OUT with ample context)
+      // Scene 4: Exact Worker Location in Tunnel B-04 (ZOOMED OUT with wide context)
       const t = smoothstep(0.65, 0.84, progress);
-      targetPos = vLerp([11.0, 14.5, -3.5], [4.8, 4.2, -7.5], t);
-      targetLook = vLerp([-1.5, 0.5, -8.5], [0, 1.1, -11.5], t);
+      targetPos = vLerp([17.5, 22.5, -3.0], [8.5, 6.8, -4.5], t);
+      targetLook = vLerp([-2.0, 0, -9.0], [0, 1.0, -11.5], t);
     } else {
-      // Scene 5: Holographic PPE Inspection (ZOOMED OUT to frame full worker comfortably)
-      targetPos = [3.2, 2.8, -8.0];
-      targetLook = [0, 1.3, -12.0];
+      // Scene 5: Holographic PPE Inspection (ZOOMED OUT MORE with generous breathing room)
+      targetPos = [7.0, 5.0, -4.2];
+      targetLook = [0, 1.2, -12.0];
     }
 
     const tVec = new THREE.Vector3(...targetPos);
@@ -845,17 +842,17 @@ export const WorkerEntryDigitalTwinAnimation: React.FC<WorkerEntryProps> = ({
       >
         <Canvas
           shadows
-          camera={{ position: [4.2, 3.2, 11.5], fov: 48 }}
+          camera={{ position: [8.0, 5.5, 16.5], fov: 52 }}
           gl={{ antialias: true, alpha: false }}
         >
           {/* Light Industrial Engineering CAD Background */}
           <color attach="background" args={['#F6F5F1']} />
-          <fog attach="fog" args={['#F6F5F1', 25, 75]} />
+          <fog attach="fog" args={['#F6F5F1', 35, 95]} />
 
-          {/* Environmental Illumination for crisp visibility */}
-          <ambientLight intensity={1.1} />
-          <directionalLight position={[12, 18, 14]} intensity={1.3} castShadow />
-          <directionalLight position={[-10, 10, -8]} intensity={0.6} color="#E2E8F0" />
+          {/* Environmental Illumination for crisp, bright visibility */}
+          <ambientLight intensity={1.2} />
+          <directionalLight position={[12, 20, 15]} intensity={1.4} castShadow />
+          <directionalLight position={[-10, 10, -8]} intensity={0.7} color="#E2E8F0" />
 
           {/* Smoothstep Cinematic Camera Controller */}
           <CameraController progress={progress} />
@@ -863,7 +860,7 @@ export const WorkerEntryDigitalTwinAnimation: React.FC<WorkerEntryProps> = ({
           {/* Surface Portal & Access Adit with Physical Scanner Arch (Scene 1 & 2) */}
           <MineEntrancePortal progress={progress} />
 
-          {/* Vaulted 3D Digital Twin Mine Network (Scene 3, 4, 5) */}
+          {/* Architectural Cutaway 3D Digital Twin Mine Network (Scene 3, 4, 5) */}
           <DigitalTwinMineNetwork />
 
           {/* Movement History Polyline Breadcrumbs */}
@@ -878,7 +875,7 @@ export const WorkerEntryDigitalTwinAnimation: React.FC<WorkerEntryProps> = ({
           />
         </Canvas>
 
-        {/* Discreet Top-Left Scene Pill (NO NEON) */}
+        {/* Discreet Top-Left Scene Pill */}
         <div className="absolute top-3 left-3 bg-[#111310]/75 backdrop-blur-md border border-white/10 rounded-lg px-2.5 py-1 shadow-xs font-mono flex items-center space-x-2 pointer-events-none">
           <span className="w-1.5 h-1.5 rounded-full bg-[#2D8A61]" />
           <span className="text-[10px] font-bold text-white tracking-wider">
