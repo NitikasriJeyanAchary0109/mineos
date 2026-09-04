@@ -126,19 +126,16 @@ export const WorkerHomePage: React.FC = () => {
   const isHealthNormal = dashboardData.health.status === 'NORMAL';
   const safetyScore = useMemo(() => getSafetyScore(activeWorker), [activeWorker]);
 
-  // 7-Point Mandatory PPE Items
-  const statutoryPpeItems = [
-    { id: 'helmet', name: 'Hard Hat', spec: 'DGMS Type-II', ok: Boolean(ppe.helmet) },
-    { id: 'capLamp', name: 'Cap Lamp', spec: 'Cordless LED', ok: ppe.capLamp !== undefined ? Boolean(ppe.capLamp) : Boolean(ppe.helmet) },
+  // 4 Mandatory PPE Items: Helmet, Vest, Gloves, Boots
+  const ppeItems = [
+    { id: 'helmet', name: 'Mining Helmet', spec: 'DGMS Type-II', ok: Boolean(ppe.helmet) },
     { id: 'vest', name: 'Safety Vest', spec: 'High-Vis Retro', ok: Boolean(ppe.vest) },
+    { id: 'gloves', name: 'Work Gloves', spec: 'Heavy Grip', ok: Boolean(ppe.gloves) },
     { id: 'boots', name: 'Steel Boots', spec: 'Metatarsal', ok: Boolean(ppe.boots) },
-    { id: 'gloves', name: 'Work Gloves', spec: 'Kevlar Grip', ok: Boolean(ppe.gloves) },
-    { id: 'gasDetector', name: 'Gas Monitor', spec: 'CH4/CO Sensor', ok: ppe.gasDetector !== undefined ? Boolean(ppe.gasDetector) : true },
-    { id: 'selfRescuer', name: 'Self-Rescuer', spec: 'FSR-60 O2 Pack', ok: ppe.selfRescuer !== undefined ? Boolean(ppe.selfRescuer) : true },
   ];
 
-  const compliantCount = statutoryPpeItems.filter((i) => i.ok).length;
-  const allPpeCompliant = compliantCount === statutoryPpeItems.length;
+  const compliantCount = ppeItems.filter((i) => i.ok).length;
+  const allPpeCompliant = compliantCount === 4;
 
   // Compliance Profile & Rewards Data
   const profile = activeWorker.complianceProfile || {
@@ -466,13 +463,13 @@ export const WorkerHomePage: React.FC = () => {
           </div>
         </div>
 
-        {/* 4. STATUTORY 7-POINT DGMS PPE VERIFICATION CHECKLIST */}
+        {/* 4. MANDATORY 4-POINT PPE VERIFICATION (Helmet, Vest, Gloves, Boots) */}
         <div className="bg-white border border-[#DCDAD4] p-4 rounded-2xl space-y-3 shadow-xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <ShieldCheck className="w-4 h-4 text-[#2D8A61]" />
               <span className="font-serif font-semibold text-xs text-[#151713]">
-                DGMS Statutory 7-Point PPE Verification
+                4-Point PPE Verification (Helmet, Vest, Gloves, Boots)
               </span>
             </div>
             <span
@@ -482,12 +479,12 @@ export const WorkerHomePage: React.FC = () => {
                   : 'bg-[#FDF2F2] text-[#A83D45] border-[#A83D45]/30'
               }`}
             >
-              {compliantCount}/7 STATUTORY PASS {allPpeCompliant ? '✓' : '⚠'}
+              {compliantCount}/4 VERIFIED {allPpeCompliant ? '✓' : '⚠'}
             </span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-            {statutoryPpeItems.map((item) => (
+            {ppeItems.map((item) => (
               <div
                 key={item.id}
                 className={`p-2.5 rounded-xl border flex flex-col justify-between transition-all ${

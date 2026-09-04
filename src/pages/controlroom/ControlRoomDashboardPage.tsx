@@ -152,17 +152,17 @@ export const ControlRoomDashboardPage: React.FC = () => {
           </div>
         )}
 
-        {/* 3-Column Command Center Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* ROW 1: Operations Command Center (3 cols Roster + 6 cols 3D Map + 3 cols Selected Worker) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
           {/* Column 1: Left Sidebar — Live Worker Roster (3 cols) */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-3 flex flex-col">
             <LiveWorkerRoster
               onSelectWorker={(id) => setSelectedWorkerId(id)}
             />
           </div>
 
-          {/* Column 2: Center Stage — 3D Mine Subterranean Digital-Twin (5 cols on lg, 5 on xl) */}
-          <div className="lg:col-span-5 flex flex-col space-y-2.5">
+          {/* Column 2: Center Stage — 3D Mine Subterranean Digital-Twin (6 cols) */}
+          <div className="lg:col-span-6 flex flex-col space-y-2">
             <div className="flex items-center justify-between px-1">
               <div className="flex items-center space-x-2">
                 <Layers className="w-4 h-4 text-[#176B4D]" />
@@ -172,6 +172,7 @@ export const ControlRoomDashboardPage: React.FC = () => {
               </div>
 
               <button
+                type="button"
                 onClick={() => navigate('/controlroom/mine-3d')}
                 className="text-xs text-[#176B4D] hover:text-[#13563D] font-medium flex items-center space-x-1"
               >
@@ -180,41 +181,8 @@ export const ControlRoomDashboardPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Zone Quick Preset Selector */}
-            <div className="flex items-center space-x-1 overflow-x-auto pb-0.5 text-[11px] font-mono">
-              <span className="text-[#666861] text-[10px] uppercase font-bold mr-1 shrink-0">Focus:</span>
-              {[
-                { label: 'All Levels', zoneId: null },
-                { label: 'Zone A (-120m)', zoneId: 'zone-a' },
-                { label: 'Zone B (-260m)', zoneId: 'zone-b' },
-                { label: 'Zone C (-440m)', zoneId: 'zone-c' },
-                { label: 'Zone D (-520m)', zoneId: 'zone-d' },
-              ].map((preset) => {
-                const isCurrent = preset.zoneId ? selectedWorker.zoneId === preset.zoneId : false;
-                return (
-                  <button
-                    key={preset.label}
-                    type="button"
-                    onClick={() => {
-                      if (preset.zoneId) {
-                        const target = workers.find((w) => w.zoneId === preset.zoneId);
-                        if (target) setSelectedWorkerId(target.id);
-                      }
-                    }}
-                    className={`px-2 py-0.5 rounded-lg border transition-all shrink-0 text-[10.5px] ${
-                      isCurrent
-                        ? 'bg-[#176B4D] text-white border-[#176B4D] font-bold shadow-2xs'
-                        : 'bg-white text-[#666861] border-[#DCDAD4] hover:text-[#151713] hover:bg-[#FAF9F6]'
-                    }`}
-                  >
-                    {preset.label}
-                  </button>
-                );
-              })}
-            </div>
-
             {/* 3D Mine Center Stage container */}
-            <div className="rounded-2xl overflow-hidden border border-[#DCDAD4] shadow-sm bg-[#F6F5F1]">
+            <div className="rounded-2xl overflow-hidden border border-[#DCDAD4] shadow-sm bg-[#F6F5F1] flex-1 min-h-[480px]">
               <MineDigitalTwin
                 workers={workers}
                 zones={zones}
@@ -224,54 +192,37 @@ export const ControlRoomDashboardPage: React.FC = () => {
                 fullScreen={false}
               />
             </div>
-
-            {/* Quick Status Legend Bar */}
-            <div className="bg-white border border-[#DCDAD4] rounded-xl p-3 flex flex-wrap items-center justify-between gap-2 text-xs text-[#666861] shadow-xs">
-              <div className="flex items-center space-x-3 text-[11px]">
-                <span className="flex items-center space-x-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#2D8A61]" />
-                  <span className="text-[#151713]">Safe</span>
-                </span>
-                <span className="flex items-center space-x-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#B47A18]" />
-                  <span className="text-[#151713]">Attention</span>
-                </span>
-                <span className="flex items-center space-x-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#A83D45]" />
-                  <span className="text-[#151713]">Critical</span>
-                </span>
-              </div>
-              <span className="text-xs font-mono text-[#666861]">
-                Drag to orbit. Scroll to zoom. Click node to inspect.
-              </span>
-            </div>
           </div>
 
-          {/* Column 3: Right Rail — Dual Scoped Telemetry Panels (4 cols) */}
-          <div className="lg:col-span-4 flex flex-col space-y-3">
-            {/* Panel 1: Selected Worker Telemetry (Heart rate, SpO2, Fall, 4-Point PPE) */}
+          {/* Column 3: Right Rail — Selected Worker Telemetry with strictly 4-Point PPE (3 cols) */}
+          <div className="lg:col-span-3 flex flex-col">
             <SelectedWorkerTelemetry
               worker={selectedWorker}
               onTogglePpePart={togglePpePart}
             />
+          </div>
+        </div>
 
-            {/* Panel 2: Gas & Environmental Telemetry (Scoped to Selected Worker's Zone) */}
+        {/* ROW 2: Telemetry Intelligence (6 cols Atmospheric Multi-Gas + 6 cols Live Alerts Feed) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+          {/* Panel 1: Gas & Environmental Telemetry (6 cols) */}
+          <div className="lg:col-span-6 flex flex-col">
             <GasEnvironmentalPanel
               telemetry={selectedZoneTelemetry}
               zoneName={currentZone?.name}
             />
           </div>
-        </div>
 
-        {/* Bottom Alerts Feed */}
-        <div className="pt-1">
-          <AlertsFeed
-            onSelectAlert={(alert) => {
-              if (alert.severity === 'critical') {
-                navigate('/controlroom/critical-alert');
-              }
-            }}
-          />
+          {/* Panel 2: Real-Time Alerts Feed (6 cols) */}
+          <div className="lg:col-span-6 flex flex-col">
+            <AlertsFeed
+              onSelectAlert={(alert) => {
+                if (alert.severity === 'critical') {
+                  navigate('/controlroom/critical-alert');
+                }
+              }}
+            />
+          </div>
         </div>
       </div>
     </ControlRoomLayout>

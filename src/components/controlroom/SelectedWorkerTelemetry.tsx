@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Worker, PpePart } from '../../types/safety';
 import { StatusBadge } from '../shared/StatusBadge';
 import { PpeHologram } from '../shared/PpeHologram';
@@ -7,19 +7,13 @@ import {
   Activity,
   MapPin,
   ShieldCheck,
-  ShieldAlert,
   CheckCircle2,
   XCircle,
   Eye,
-  Clock,
   Radio,
   Battery,
-  Send,
   BellRing,
-  AlertTriangle,
-  Flame,
   Wifi,
-  Sparkles,
 } from 'lucide-react';
 
 interface SelectedWorkerTelemetryProps {
@@ -27,56 +21,38 @@ interface SelectedWorkerTelemetryProps {
   onTogglePpePart?: (part: PpePart) => void;
 }
 
-// =============================================================================
-// ANIMATED ECG WAVEFORM COMPONENT
-// Sweeps an authentic electrocardiogram pulse wave matching the worker's heart rate
-// =============================================================================
-const EcgWaveform: React.FC<{ heartRate: number; status: 'normal' | 'elevated' | 'critical' }> = ({
+// Compact ECG Waveform
+const CompactEcgWaveform: React.FC<{ heartRate: number; status: 'normal' | 'elevated' | 'critical' }> = ({
   heartRate,
   status,
 }) => {
   const strokeColor =
     status === 'critical' ? '#A83D45' : status === 'elevated' ? '#B47A18' : '#2D8A61';
 
-  // Pulse animation duration based on BPM (e.g. 72 BPM = ~0.83s cycle)
-  const animDuration = Math.max(0.4, Math.min(1.5, 60 / (heartRate || 72))).toFixed(2);
+  const animDuration = Math.max(0.4, Math.min(1.4, 60 / (heartRate || 72))).toFixed(2);
 
   return (
-    <div className="relative w-full h-8 overflow-hidden rounded bg-[#FAF9F6] border border-[#ECEBE6] flex items-center">
-      {/* Grid lines background */}
-      <div
-        className="absolute inset-0 opacity-25"
-        style={{
-          backgroundImage:
-            'linear-gradient(to right, #DCDAD4 1px, transparent 1px), linear-gradient(to bottom, #DCDAD4 1px, transparent 1px)',
-          backgroundSize: '8px 8px',
-        }}
-      />
-
-      {/* Pulsing ECG line */}
-      <svg className="w-full h-full" viewBox="0 0 200 32" preserveAspectRatio="none">
+    <div className="relative w-full h-6 overflow-hidden rounded bg-[#FAF9F6] border border-[#ECEBE6] flex items-center">
+      <svg className="w-full h-full" viewBox="0 0 160 24" preserveAspectRatio="none">
         <path
-          d="M 0,16 L 25,16 L 32,16 L 36,12 L 40,20 L 44,4 L 48,28 L 52,14 L 56,18 L 60,16 L 90,16 L 100,16 L 106,12 L 110,20 L 114,4 L 118,28 L 122,14 L 126,18 L 130,16 L 160,16 L 170,16 L 176,12 L 180,20 L 184,4 L 188,28 L 192,14 L 196,18 L 200,16"
+          d="M 0,12 L 20,12 L 25,12 L 28,9 L 31,15 L 34,3 L 37,21 L 40,10 L 43,14 L 46,12 L 70,12 L 78,12 L 82,9 L 85,15 L 88,3 L 91,21 L 94,10 L 97,14 L 100,12 L 130,12 L 138,12 L 142,9 L 145,15 L 148,3 L 151,21 L 154,10 L 157,14 L 160,12"
           fill="none"
           stroke={strokeColor}
-          strokeWidth="1.8"
+          strokeWidth="1.6"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
       </svg>
-
-      {/* Moving scanning beam */}
       <div
-        className="absolute top-0 bottom-0 w-8 bg-gradient-to-r from-transparent via-white/80 to-transparent pointer-events-none"
+        className="absolute top-0 bottom-0 w-6 bg-gradient-to-r from-transparent via-white/80 to-transparent pointer-events-none"
         style={{
           animation: `ecgSweep ${animDuration}s linear infinite`,
         }}
       />
-
       <style>{`
         @keyframes ecgSweep {
           0% { transform: translateX(-100%); }
-          100% { transform: translateX(300px); }
+          100% { transform: translateX(200px); }
         }
       `}</style>
     </div>
@@ -92,40 +68,21 @@ export const SelectedWorkerTelemetry: React.FC<SelectedWorkerTelemetryProps> = (
 
   const ppe = worker.ppeStatus;
 
-  // 7-Point DGMS Statutory PPE item list
-  const statutoryPpeItems: Array<{ id: PpePart; label: string; sub: string }> = [
-    { id: 'helmet', label: 'Hard Hat', sub: 'DGMS Type-II' },
-    { id: 'capLamp', label: 'Cap Lamp', sub: 'Cordless LED' },
-    { id: 'vest', label: 'Safety Vest', sub: 'High-Vis Retro' },
-    { id: 'boots', label: 'Steel Boots', sub: 'Metatarsal' },
-    { id: 'gloves', label: 'Work Gloves', sub: 'Heavy Grip' },
-    { id: 'gasDetector', label: 'Gas Monitor', sub: 'CH4/CO/O2' },
-    { id: 'selfRescuer', label: 'Self-Rescuer', sub: 'FSR-60 O2' },
+  // STRICTLY 4-POINT PPE ITEMS: Helmet, Vest, Gloves, Boots
+  const ppeList: Array<{ id: PpePart; label: string; ok: boolean }> = [
+    { id: 'helmet', label: 'Helmet', ok: Boolean(ppe.helmet) },
+    { id: 'vest', label: 'Safety Vest', ok: Boolean(ppe.vest) },
+    { id: 'gloves', label: 'Gloves', ok: Boolean(ppe.gloves) },
+    { id: 'boots', label: 'Boots', ok: Boolean(ppe.boots) },
   ];
 
-  // Calculate compliance across all items
-  const isDetected = (part: PpePart): boolean => {
-    if (part === 'helmet') return Boolean(ppe.helmet);
-    if (part === 'vest') return Boolean(ppe.vest);
-    if (part === 'boots') return Boolean(ppe.boots);
-    if (part === 'gloves') return Boolean(ppe.gloves);
-    if (part === 'capLamp') return ppe.capLamp !== undefined ? Boolean(ppe.capLamp) : Boolean(ppe.helmet);
-    if (part === 'gasDetector') return ppe.gasDetector !== undefined ? Boolean(ppe.gasDetector) : true;
-    if (part === 'selfRescuer') return ppe.selfRescuer !== undefined ? Boolean(ppe.selfRescuer) : true;
-    return true;
-  };
-
-  const compliantCount = statutoryPpeItems.filter((i) => isDetected(i.id)).length;
-  const isAllCompliant = compliantCount === statutoryPpeItems.length;
+  const compliantCount = ppeList.filter((item) => item.ok).length;
+  const allCompliant = compliantCount === 4;
 
   const getHeartRateStyle = (hr: number, status: string) => {
-    if (status === 'critical' || hr > 130) {
-      return 'bg-[#FDF2F2] border-[#A83D45]/50 text-[#A83D45]';
-    }
-    if (status === 'elevated' || hr > 100) {
-      return 'bg-[#FEF9E7] border-[#B47A18]/50 text-[#B47A18]';
-    }
-    return 'bg-[#EAF3EF] border-[#2D8A61]/30 text-[#2D8A61]';
+    if (status === 'critical' || hr > 130) return 'bg-[#FDF2F2] border-[#A83D45]/40 text-[#A83D45]';
+    if (status === 'elevated' || hr > 100) return 'bg-[#FEF9E7] border-[#B47A18]/40 text-[#B47A18]';
+    return 'bg-[#FAF9F6] border-[#ECEBE6] text-[#151713]';
   };
 
   const isFall = worker.vitals.movement === 'fall';
@@ -136,42 +93,42 @@ export const SelectedWorkerTelemetry: React.FC<SelectedWorkerTelemetryProps> = (
   };
 
   return (
-    <div className="bg-white border border-[#DCDAD4] rounded-2xl p-4 flex flex-col space-y-3.5 shadow-sm relative">
-      {/* Action Confirmation Toast */}
+    <div className="bg-white border border-[#DCDAD4] rounded-2xl p-3.5 flex flex-col justify-between shadow-sm relative h-full space-y-2.5">
+      {/* Action Toast */}
       {toastMsg && (
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30 bg-[#151713] text-white text-[11px] font-mono px-3 py-1.5 rounded-lg shadow-lg border border-[#2D8A61]/60 flex items-center space-x-2 animate-in fade-in slide-in-from-top-2">
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30 bg-[#151713] text-white text-[10.5px] font-mono px-3 py-1 rounded-lg shadow-lg border border-[#2D8A61]/60 flex items-center space-x-1.5 animate-in fade-in">
           <span className="w-1.5 h-1.5 rounded-full bg-[#2D8A61]" />
           <span>{toastMsg}</span>
         </div>
       )}
 
-      {/* Panel Title & Worker Identification */}
-      <div className="flex items-start justify-between border-b border-[#ECEBE6] pb-3">
+      {/* Header: Name, Status & 3D Toggle */}
+      <div className="flex items-start justify-between border-b border-[#ECEBE6] pb-2">
         <div>
           <div className="text-[10px] text-[#666861] uppercase tracking-wider font-semibold flex items-center space-x-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-[#2D8A61] animate-pulse" />
-            <span>Active Personnel Telemetry</span>
+            <span>Active Worker Telemetry</span>
           </div>
           <div className="flex items-center space-x-2 mt-0.5">
-            <h2 className="font-serif font-semibold text-lg text-[#151713]">
+            <h2 className="font-serif font-semibold text-base text-[#151713] leading-tight">
               {worker.name}
             </h2>
             <StatusBadge status={worker.status} size="sm" />
           </div>
-          <div className="flex items-center space-x-2 text-xs text-[#666861] mt-0.5 font-mono">
+          <div className="flex items-center space-x-2 text-[11px] text-[#666861] font-mono">
             <span>ID: <strong className="text-[#151713]">{worker.id}</strong></span>
             <span>•</span>
-            <span>{worker.role}</span>
+            <span className="truncate max-w-[130px]">{worker.role}</span>
           </div>
         </div>
 
         <button
           type="button"
           onClick={() => setShowHologramModal(!showHologramModal)}
-          className="px-2.5 py-1.5 rounded-xl bg-[#FAF9F6] hover:bg-white border border-[#DCDAD4] text-[#176B4D] text-xs font-semibold flex items-center space-x-1.5 transition-all shadow-xs"
+          className="px-2 py-1 rounded-lg bg-[#FAF9F6] hover:bg-white border border-[#DCDAD4] text-[#176B4D] text-[11px] font-semibold flex items-center space-x-1 transition-all shadow-2xs shrink-0"
         >
-          <Eye className="w-3.5 h-3.5 text-[#176B4D]" />
-          <span>{showHologramModal ? 'Hide 3D' : '3D Model'}</span>
+          <Eye className="w-3 h-3 text-[#176B4D]" />
+          <span>{showHologramModal ? 'Close 3D' : '3D Model'}</span>
         </button>
       </div>
 
@@ -188,212 +145,155 @@ export const SelectedWorkerTelemetry: React.FC<SelectedWorkerTelemetryProps> = (
         </div>
       )}
 
-      {/* Primary Biometrics Grid */}
-      <div className="grid grid-cols-2 gap-2.5">
-        {/* Heart Rate + Live ECG Waveform */}
-        <div
-          className={`p-3 rounded-xl border text-xs flex flex-col justify-between ${getHeartRateStyle(
-            worker.vitals.heartRate,
-            worker.vitals.heartRateStatus
-          )}`}
-        >
-          <div className="text-[10px] uppercase flex items-center justify-between font-medium">
+      {/* Primary Biometrics: Heart Rate & SpO2 */}
+      <div className="grid grid-cols-2 gap-2">
+        {/* Heart Rate */}
+        <div className={`p-2.5 rounded-xl border flex flex-col justify-between ${getHeartRateStyle(worker.vitals.heartRate, worker.vitals.heartRateStatus)}`}>
+          <div className="flex items-center justify-between text-[10px] uppercase font-semibold">
             <span className="flex items-center space-x-1">
               <Heart className="w-3 h-3 text-current" />
               <span>Heart Rate</span>
             </span>
-            <span className="font-mono text-[9px] font-bold px-1.5 py-0.2 rounded bg-white/70">
-              LIVE ECG
-            </span>
+            <span className="font-mono text-[9px] opacity-75">LIVE</span>
           </div>
-
-          <div className="flex items-baseline space-x-2 my-1">
-            <span className="font-serif font-semibold text-2xl">
-              {worker.vitals.heartRate}
-            </span>
-            <span className="text-xs font-sans font-normal text-[#666861]">BPM</span>
+          <div className="flex items-baseline space-x-1 my-0.5">
+            <span className="font-serif font-bold text-xl">{worker.vitals.heartRate}</span>
+            <span className="text-[10px] text-[#666861]">BPM</span>
           </div>
-
-          {/* Miniature Sweeping Waveform */}
-          <div className="my-1">
-            <EcgWaveform
-              heartRate={worker.vitals.heartRate}
-              status={worker.vitals.heartRateStatus}
-            />
-          </div>
-
-          <div className="text-[10px] uppercase font-semibold mt-1">
-            {worker.vitals.heartRateStatus === 'normal' ? 'Sinus Rhythm (Normal)' : 'Elevated Cardiac Load'}
-          </div>
+          <CompactEcgWaveform heartRate={worker.vitals.heartRate} status={worker.vitals.heartRateStatus} />
         </div>
 
-        {/* SpO2 Blood Oxygen Saturation */}
-        <div className="p-3 rounded-xl border border-[#ECEBE6] bg-[#FAF9F6] text-xs flex flex-col justify-between">
-          <div className="text-[10px] uppercase flex items-center justify-between text-[#666861] font-medium">
+        {/* SpO2 Blood Oxygen */}
+        <div className="p-2.5 rounded-xl border border-[#ECEBE6] bg-[#FAF9F6] flex flex-col justify-between">
+          <div className="flex items-center justify-between text-[10px] uppercase font-semibold text-[#666861]">
             <span className="flex items-center space-x-1">
               <Activity className="w-3 h-3 text-[#176B4D]" />
-              <span>Blood Oxygen</span>
+              <span>Oxygen</span>
             </span>
-            <span className="font-mono text-[9px] font-semibold text-[#176B4D]">SpO2</span>
+            <span className="font-mono text-[9px] text-[#176B4D]">SpO2</span>
           </div>
-
-          <div className="flex items-baseline space-x-1.5 my-1">
-            <span className="font-serif font-semibold text-2xl text-[#151713]">
-              {worker.vitals.spo2}
-            </span>
-            <span className="text-xs font-sans font-normal text-[#666861]">% Saturation</span>
+          <div className="flex items-baseline space-x-1 my-0.5">
+            <span className="font-serif font-bold text-xl text-[#151713]">{worker.vitals.spo2}</span>
+            <span className="text-[10px] text-[#666861]">%</span>
           </div>
-
-          {/* Calibrated Fill Bar with 90% Hypoxia Marker */}
-          <div className="space-y-1">
-            <div className="w-full h-2 rounded-full bg-[#E2E0D8] overflow-hidden relative">
+          <div className="space-y-0.5">
+            <div className="w-full h-1.5 rounded-full bg-[#E2E0D8] overflow-hidden">
               <div
-                className={`h-full transition-all duration-500 rounded-full ${
-                  worker.vitals.spo2 >= 95
-                    ? 'bg-[#2D8A61]'
-                    : worker.vitals.spo2 >= 90
-                    ? 'bg-[#B47A18]'
-                    : 'bg-[#A83D45]'
+                className={`h-full rounded-full transition-all duration-300 ${
+                  worker.vitals.spo2 >= 95 ? 'bg-[#2D8A61]' : worker.vitals.spo2 >= 90 ? 'bg-[#B47A18]' : 'bg-[#A83D45]'
                 }`}
                 style={{ width: `${Math.min(100, worker.vitals.spo2)}%` }}
               />
-              {/* 90% threshold marker */}
-              <div
-                className="absolute top-0 bottom-0 w-0.5 bg-[#A83D45] opacity-75"
-                style={{ left: '90%' }}
-                title="DGMS Critical Hypoxia Threshold (90%)"
-              />
             </div>
-            <div className="flex justify-between text-[9px] font-mono text-[#666861]">
+            <div className="flex justify-between text-[8px] font-mono text-[#666861]">
               <span>85%</span>
-              <span className="text-[#A83D45] font-bold">90% Limit</span>
+              <span className="text-[#A83D45]">90% Limit</span>
               <span>100%</span>
             </div>
-          </div>
-
-          <div className="text-[10px] uppercase font-semibold text-[#666861] mt-1">
-            {worker.vitals.spo2 >= 95 ? 'Optimal Saturation' : 'Hypoxia Alert (<95%)'}
-          </div>
-        </div>
-
-        {/* Assigned Underground Sector */}
-        <div className="p-3 rounded-xl bg-[#FAF9F6] border border-[#ECEBE6] text-xs flex flex-col justify-between">
-          <div className="text-[10px] text-[#666861] uppercase flex items-center space-x-1 font-medium">
-            <MapPin className="w-3 h-3 text-[#176B4D]" />
-            <span>Assigned Sector</span>
-          </div>
-          <div className="font-serif font-semibold text-base text-[#151713] mt-1 uppercase flex items-center justify-between">
-            <span>{worker.zoneId.toUpperCase()}</span>
-            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-[#EAF3EF] text-[#176B4D] border border-[#176B4D]/20">
-              Active Shift
-            </span>
-          </div>
-          <div className="text-[10px] text-[#666861]">Station 14+20 // Depth -260m</div>
-        </div>
-
-        {/* 6-Axis IMU Orientation & Deceleration */}
-        <div
-          className={`p-3 rounded-xl border text-xs flex flex-col justify-between ${
-            isFall
-              ? 'bg-[#FDF2F2] border-[#A83D45]/60 text-[#A83D45]'
-              : 'bg-[#EAF3EF] border-[#2D8A61]/30 text-[#2D8A61]'
-          }`}
-        >
-          <div className="text-[10px] uppercase flex items-center space-x-1 font-medium">
-            <Activity className="w-3 h-3" />
-            <span>6-Axis IMU Sensor</span>
-          </div>
-          <div className="font-serif font-semibold text-base my-0.5">
-            {isFall ? 'FALL DETECTED ⚠' : 'UPRIGHT // 0.98g'}
-          </div>
-          <div className="text-[10px] uppercase font-semibold">
-            {isFall ? 'High Deceleration Shock' : 'Nominal Posture'}
           </div>
         </div>
       </div>
 
-      {/* Statutory 7-Point DGMS PPE Compliance Strip */}
-      <div className="bg-[#FAF9F6] border border-[#DCDAD4] rounded-xl p-3 space-y-2">
+      {/* Sector Location & 6-Axis Orientation */}
+      <div className="grid grid-cols-2 gap-2 text-xs">
+        <div className="p-2 rounded-xl bg-[#FAF9F6] border border-[#ECEBE6] flex items-center justify-between">
+          <div className="flex items-center space-x-1.5">
+            <MapPin className="w-3.5 h-3.5 text-[#176B4D]" />
+            <div>
+              <div className="text-[9px] text-[#666861] uppercase font-semibold">Sector</div>
+              <div className="font-serif font-bold text-xs text-[#151713] uppercase">{worker.zoneId}</div>
+            </div>
+          </div>
+          <span className="text-[9px] font-mono bg-[#EAF3EF] text-[#176B4D] px-1.5 py-0.2 rounded font-semibold">
+            Active
+          </span>
+        </div>
+
+        <div className={`p-2 rounded-xl border flex items-center justify-between ${
+          isFall ? 'bg-[#FDF2F2] border-[#A83D45]/60 text-[#A83D45]' : 'bg-[#FAF9F6] border-[#ECEBE6]'
+        }`}>
+          <div className="flex items-center space-x-1.5">
+            <Activity className="w-3.5 h-3.5 text-[#176B4D]" />
+            <div>
+              <div className="text-[9px] text-[#666861] uppercase font-semibold">Orientation</div>
+              <div className="font-serif font-bold text-xs">{isFall ? 'FALL ⚠' : 'UPRIGHT'}</div>
+            </div>
+          </div>
+          <span className="text-[9px] font-mono text-[#666861]">0.98g</span>
+        </div>
+      </div>
+
+      {/* 4-POINT PPE VERIFICATION (Helmet, Vest, Gloves, Boots) */}
+      <div className="bg-[#FAF9F6] border border-[#DCDAD4] rounded-xl p-2.5 space-y-1.5">
         <div className="flex items-center justify-between text-xs">
-          <span className="text-[#151713] font-semibold uppercase flex items-center space-x-1.5">
+          <span className="text-[#151713] font-semibold text-[11px] uppercase flex items-center space-x-1">
             <ShieldCheck className="w-3.5 h-3.5 text-[#176B4D]" />
-            <span>DGMS 7-Point PPE Verification</span>
+            <span>4-Point PPE Verification</span>
           </span>
           <span
-            className={`font-mono text-[10px] font-bold px-2 py-0.5 rounded ${
-              isAllCompliant
+            className={`font-mono text-[9.5px] font-bold px-1.5 py-0.2 rounded ${
+              allCompliant
                 ? 'bg-[#EAF3EF] text-[#2D8A61] border border-[#2D8A61]/30'
                 : 'bg-[#FDF2F2] text-[#A83D45] border border-[#A83D45]/30'
             }`}
           >
-            {compliantCount}/7 VERIFIED {isAllCompliant ? '✓' : '⚠'}
+            {compliantCount}/4 {allCompliant ? 'PASS ✓' : 'VIOLATION ⚠'}
           </span>
         </div>
 
-        <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5 text-center text-xs">
-          {statutoryPpeItems.map((item) => {
-            const ok = isDetected(item.id);
-            return (
-              <div
-                key={item.id}
-                className={`p-1.5 rounded-lg border flex flex-col items-center justify-center transition-all ${
-                  ok
-                    ? 'bg-[#EAF3EF] border-[#2D8A61]/30 text-[#2D8A61]'
-                    : 'bg-[#FDF2F2] border-[#A83D45]/40 text-[#A83D45]'
-                }`}
-                title={`${item.label} (${item.sub}): ${ok ? 'Verified Compliant' : 'Missing / Violation'}`}
-              >
-                <span className="text-[9px] font-semibold leading-tight line-clamp-1">
-                  {item.label}
-                </span>
-                <span className="text-[7.5px] opacity-75 font-mono leading-tight">
-                  {item.sub}
-                </span>
-                <div className="mt-1">
-                  {ok ? (
-                    <CheckCircle2 className="w-3 h-3 text-[#2D8A61]" />
-                  ) : (
-                    <XCircle className="w-3 h-3 text-[#A83D45]" />
-                  )}
-                </div>
+        <div className="grid grid-cols-4 gap-1.5 text-center text-xs">
+          {ppeList.map((item) => (
+            <div
+              key={item.id}
+              className={`p-1.5 rounded-lg border flex flex-col items-center justify-center transition-all ${
+                item.ok
+                  ? 'bg-white border-[#2D8A61]/40 text-[#2D8A61]'
+                  : 'bg-[#FDF2F2] border-[#A83D45]/40 text-[#A83D45]'
+              }`}
+            >
+              <span className="text-[9.5px] font-semibold leading-tight">{item.label}</span>
+              <div className="mt-0.5">
+                {item.ok ? (
+                  <CheckCircle2 className="w-3 h-3 text-[#2D8A61]" />
+                ) : (
+                  <XCircle className="w-3 h-3 text-[#A83D45]" />
+                )}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* LoRa Telemetry & Battery Indicator */}
-      <div className="bg-white border border-[#ECEBE6] rounded-xl p-2.5 flex items-center justify-between text-xs font-mono text-[#666861]">
-        <div className="flex items-center space-x-2">
-          <Wifi className="w-3.5 h-3.5 text-[#176B4D]" />
-          <span>LoRa: <strong className="text-[#151713]">-78 dBm (Ch 4)</strong></span>
+      {/* LoRa Telemetry & Battery */}
+      <div className="flex items-center justify-between text-[10.5px] font-mono text-[#666861] bg-[#FAF9F6] px-2.5 py-1.5 rounded-xl border border-[#ECEBE6]">
+        <div className="flex items-center space-x-1">
+          <Wifi className="w-3 h-3 text-[#176B4D]" />
+          <span>LoRa: <strong className="text-[#151713]">-78 dBm</strong></span>
         </div>
-        <div className="flex items-center space-x-1.5">
-          <Battery className="w-3.5 h-3.5 text-[#2D8A61]" />
+        <div className="flex items-center space-x-1">
+          <Battery className="w-3 h-3 text-[#2D8A61]" />
           <span>Battery: <strong className="text-[#151713]">84%</strong></span>
         </div>
-        <div className="text-[10px] text-[#2D8A61] font-semibold">
-          ● SYNCED
-        </div>
+        <span className="text-[9.5px] text-[#2D8A61] font-bold">● SYNCED</span>
       </div>
 
-      {/* Supervisor Quick Dispatch Actions */}
-      <div className="grid grid-cols-2 gap-2 pt-1">
+      {/* Quick Dispatch Action Buttons */}
+      <div className="grid grid-cols-2 gap-1.5 pt-0.5">
         <button
           type="button"
-          onClick={() => handleActionToast(`Ping broadcast to ${worker.name}'s wearable via LoRa Mesh`)}
-          className="px-3 py-2 rounded-xl bg-[#FAF9F6] hover:bg-white border border-[#DCDAD4] text-[#151713] text-xs font-semibold flex items-center justify-center space-x-1.5 shadow-2xs transition-colors"
+          onClick={() => handleActionToast(`Ping sent to ${worker.name} via LoRa Mesh`)}
+          className="px-2.5 py-1.5 rounded-xl bg-[#FAF9F6] hover:bg-white border border-[#DCDAD4] text-[#151713] text-[11px] font-semibold flex items-center justify-center space-x-1 transition-colors shadow-2xs"
         >
-          <Radio className="w-3.5 h-3.5 text-[#176B4D]" />
+          <Radio className="w-3 h-3 text-[#176B4D]" />
           <span>Ping Wearable</span>
         </button>
 
         <button
           type="button"
           onClick={() => handleActionToast(`Surface recall notice issued for ${worker.id}`)}
-          className="px-3 py-2 rounded-xl bg-[#FAF9F6] hover:bg-[#FEF9E7] border border-[#B47A18]/30 text-[#B47A18] text-xs font-semibold flex items-center justify-center space-x-1.5 shadow-2xs transition-colors"
+          className="px-2.5 py-1.5 rounded-xl bg-[#FAF9F6] hover:bg-[#FEF9E7] border border-[#B47A18]/30 text-[#B47A18] text-[11px] font-semibold flex items-center justify-center space-x-1 transition-colors shadow-2xs"
         >
-          <BellRing className="w-3.5 h-3.5 text-[#B47A18]" />
+          <BellRing className="w-3 h-3 text-[#B47A18]" />
           <span>Recall to Surface</span>
         </button>
       </div>

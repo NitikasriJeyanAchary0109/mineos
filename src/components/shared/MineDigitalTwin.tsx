@@ -578,7 +578,7 @@ export const MineDigitalTwin: React.FC<MineDigitalTwinProps> = ({
   return (
     <div
       className={`relative w-full ${
-        fullScreen ? 'h-[calc(100vh-140px)]' : 'h-[500px] sm:h-[620px]'
+        fullScreen ? 'h-[calc(100vh-140px)]' : 'h-[480px]'
       } bg-[#F6F5F1] rounded-2xl overflow-hidden border border-[#DCDAD4] shadow-sm flex flex-col`}
     >
       {/* ==================== TOP FLOATING ZONE SELECTOR BUTTONS (ALL, ZONE A, ZONE B, ZONE C, ZONE D) ==================== */}
