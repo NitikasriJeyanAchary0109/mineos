@@ -1,10 +1,13 @@
-export type PpePart = 'helmet' | 'vest' | 'boots' | 'gloves';
+export type PpePart = 'helmet' | 'capLamp' | 'vest' | 'boots' | 'gloves' | 'gasDetector' | 'selfRescuer';
 
 export interface PpeStatus {
   helmet: boolean;
+  capLamp?: boolean;
   vest: boolean;
   boots: boolean;
   gloves: boolean;
+  gasDetector?: boolean;
+  selfRescuer?: boolean;
 }
 
 export type WorkerSafetyStatus = 'safe' | 'attention' | 'critical';

@@ -16,6 +16,7 @@ import {
   VolumeX,
   ExternalLink,
   Check,
+  Clock,
 } from 'lucide-react';
 
 export const ControlRoomDashboardPage: React.FC = () => {
@@ -44,19 +45,29 @@ export const ControlRoomDashboardPage: React.FC = () => {
   return (
     <ControlRoomLayout>
       <div className="space-y-5">
-        {/* Top Editorial Header */}
-        <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2 border-b border-[#ECEBE6] pb-4">
+        {/* Top Editorial Header with Operational Shift Status */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-[#ECEBE6] pb-4">
           <div>
-            <div className="text-[11px] font-mono tracking-[0.2em] uppercase text-[#666861] font-semibold">
-              Mine Operations
+            <div className="text-[11px] font-mono tracking-[0.2em] uppercase text-[#666861] font-semibold flex items-center space-x-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2D8A61] animate-pulse" />
+              <span>Mine Operations Telemetry // Jharia Coalfield</span>
             </div>
             <h1 className="font-serif text-2xl sm:text-3xl text-[#151713] font-normal tracking-tight mt-0.5">
               Underground safety at a glance.
             </h1>
           </div>
-          <p className="text-xs sm:text-sm text-[#666861] max-w-md">
-            Live personnel, environmental and safety intelligence across all active mine levels.
-          </p>
+
+          {/* Operational Shift & DGMS Stat Bar */}
+          <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
+            <div className="px-3 py-1.5 rounded-xl bg-white border border-[#DCDAD4] shadow-2xs flex items-center space-x-2 text-[#151713]">
+              <Clock className="w-3.5 h-3.5 text-[#176B4D]" />
+              <span>Shift A: <strong className="text-[#176B4D]">06:00 – 14:00 IST</strong></span>
+            </div>
+            <div className="px-3 py-1.5 rounded-xl bg-[#EAF3EF] border border-[#2D8A61]/30 text-[#2D8A61] font-semibold shadow-2xs flex items-center space-x-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2D8A61]" />
+              <span>DGMS Rule 181 Compliant</span>
+            </div>
+          </div>
         </div>
 
         {/* ==================== CRITICAL HAZARD ALERT SECTION ==================== */}
@@ -169,8 +180,41 @@ export const ControlRoomDashboardPage: React.FC = () => {
               </button>
             </div>
 
+            {/* Zone Quick Preset Selector */}
+            <div className="flex items-center space-x-1 overflow-x-auto pb-0.5 text-[11px] font-mono">
+              <span className="text-[#666861] text-[10px] uppercase font-bold mr-1 shrink-0">Focus:</span>
+              {[
+                { label: 'All Levels', zoneId: null },
+                { label: 'Zone A (-120m)', zoneId: 'zone-a' },
+                { label: 'Zone B (-260m)', zoneId: 'zone-b' },
+                { label: 'Zone C (-440m)', zoneId: 'zone-c' },
+                { label: 'Zone D (-520m)', zoneId: 'zone-d' },
+              ].map((preset) => {
+                const isCurrent = preset.zoneId ? selectedWorker.zoneId === preset.zoneId : false;
+                return (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => {
+                      if (preset.zoneId) {
+                        const target = workers.find((w) => w.zoneId === preset.zoneId);
+                        if (target) setSelectedWorkerId(target.id);
+                      }
+                    }}
+                    className={`px-2 py-0.5 rounded-lg border transition-all shrink-0 text-[10.5px] ${
+                      isCurrent
+                        ? 'bg-[#176B4D] text-white border-[#176B4D] font-bold shadow-2xs'
+                        : 'bg-white text-[#666861] border-[#DCDAD4] hover:text-[#151713] hover:bg-[#FAF9F6]'
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                );
+              })}
+            </div>
+
             {/* 3D Mine Center Stage container */}
-            <div className="rounded-2xl overflow-hidden border border-[#DCDAD4] shadow-sm bg-[#171A17]">
+            <div className="rounded-2xl overflow-hidden border border-[#DCDAD4] shadow-sm bg-[#F6F5F1]">
               <MineDigitalTwin
                 workers={workers}
                 zones={zones}

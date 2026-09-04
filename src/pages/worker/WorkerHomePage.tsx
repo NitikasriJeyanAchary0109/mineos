@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { WorkerLayout } from '../../components/worker/WorkerLayout';
 import { IndustrialButton } from '../../components/shared/IndustrialButton';
 import { useSafety } from '../../context/SafetyContext';
 import { BACKEND_API_URL } from '../../lib/supabase';
+import { getSafetyScore } from '../../utils/safetyScoring';
 import confetti from 'canvas-confetti';
 import {
   ShieldCheck,
@@ -27,6 +28,11 @@ import {
   X,
   Shield,
   Trophy,
+  Heart,
+  Activity,
+  Wind,
+  Battery,
+  Wifi,
 } from 'lucide-react';
 
 interface WorkerDashboardData {
@@ -62,7 +68,7 @@ interface WorkerDashboardData {
 
 export const WorkerHomePage: React.FC = () => {
   const navigate = useNavigate();
-  const { activeWorker } = useSafety();
+  const { activeWorker, selectedZoneTelemetry } = useSafety();
 
   const [dashboardData, setDashboardData] = useState<WorkerDashboardData>({
     worker_id: activeWorker.id || 'W001',
@@ -117,8 +123,22 @@ export const WorkerHomePage: React.FC = () => {
   }, [activeWorker.id]);
 
   const ppe = activeWorker.ppeStatus;
-  const allPpe = ppe.helmet && ppe.vest && ppe.boots && ppe.gloves;
   const isHealthNormal = dashboardData.health.status === 'NORMAL';
+  const safetyScore = useMemo(() => getSafetyScore(activeWorker), [activeWorker]);
+
+  // 7-Point Mandatory PPE Items
+  const statutoryPpeItems = [
+    { id: 'helmet', name: 'Hard Hat', spec: 'DGMS Type-II', ok: Boolean(ppe.helmet) },
+    { id: 'capLamp', name: 'Cap Lamp', spec: 'Cordless LED', ok: ppe.capLamp !== undefined ? Boolean(ppe.capLamp) : Boolean(ppe.helmet) },
+    { id: 'vest', name: 'Safety Vest', spec: 'High-Vis Retro', ok: Boolean(ppe.vest) },
+    { id: 'boots', name: 'Steel Boots', spec: 'Metatarsal', ok: Boolean(ppe.boots) },
+    { id: 'gloves', name: 'Work Gloves', spec: 'Kevlar Grip', ok: Boolean(ppe.gloves) },
+    { id: 'gasDetector', name: 'Gas Monitor', spec: 'CH4/CO Sensor', ok: ppe.gasDetector !== undefined ? Boolean(ppe.gasDetector) : true },
+    { id: 'selfRescuer', name: 'Self-Rescuer', spec: 'FSR-60 O2 Pack', ok: ppe.selfRescuer !== undefined ? Boolean(ppe.selfRescuer) : true },
+  ];
+
+  const compliantCount = statutoryPpeItems.filter((i) => i.ok).length;
+  const allPpeCompliant = compliantCount === statutoryPpeItems.length;
 
   // Compliance Profile & Rewards Data
   const profile = activeWorker.complianceProfile || {
@@ -146,7 +166,7 @@ export const WorkerHomePage: React.FC = () => {
   return (
     <WorkerLayout showNav={true}>
       <div className="space-y-4 text-[#151713]">
-        {/* Subterranean Zone & Status Strip */}
+        {/* Subterranean Zone & Comms Strip */}
         <div className="grid grid-cols-3 gap-2.5 text-center text-xs">
           <div className="bg-white border border-[#DCDAD4] p-3 rounded-2xl flex flex-col items-center shadow-xs">
             <div className="flex items-center space-x-1 text-[#666861] text-[11px] uppercase font-medium">
@@ -160,10 +180,10 @@ export const WorkerHomePage: React.FC = () => {
 
           <div className="bg-white border border-[#DCDAD4] p-3 rounded-2xl flex flex-col items-center shadow-xs">
             <div className="flex items-center space-x-1 text-[#666861] text-[11px] uppercase font-medium">
-              <Radio className="w-3.5 h-3.5 text-[#2D8A61]" />
-              <span>Comms Link</span>
+              <Wifi className="w-3.5 h-3.5 text-[#2D8A61]" />
+              <span>LoRa Mesh</span>
             </div>
-            <span className="font-serif font-semibold text-[#2D8A61] mt-1 text-sm">Active Mesh</span>
+            <span className="font-serif font-semibold text-[#2D8A61] mt-1 text-sm">-78 dBm (Ch 4)</span>
           </div>
 
           <div className="bg-white border border-[#DCDAD4] p-3 rounded-2xl flex flex-col items-center shadow-xs">
@@ -175,11 +195,60 @@ export const WorkerHomePage: React.FC = () => {
           </div>
         </div>
 
+        {/* Live Personal Wearable Vitals Strip */}
+        <div className="bg-white border border-[#DCDAD4] p-3.5 rounded-2xl shadow-xs">
+          <div className="flex items-center justify-between mb-2 pb-2 border-b border-[#ECEBE6]">
+            <div className="flex items-center space-x-2">
+              <Activity className="w-4 h-4 text-[#176B4D]" />
+              <span className="font-serif font-semibold text-xs text-[#151713]">
+                Live Wearable Bio-Telemetry
+              </span>
+            </div>
+            <span className="text-[10px] font-mono text-[#2D8A61] font-semibold bg-[#EAF3EF] px-2 py-0.5 rounded">
+              Wearable ID: {activeWorker.wearableId}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 text-center text-xs">
+            <div className="bg-[#FAF9F6] border border-[#ECEBE6] p-2 rounded-xl">
+              <div className="flex items-center justify-center space-x-1 text-[#666861] text-[10px] uppercase font-medium">
+                <Heart className="w-3 h-3 text-[#A83D45]" />
+                <span>Heart Rate</span>
+              </div>
+              <div className="font-serif font-bold text-lg text-[#151713] mt-0.5">
+                {activeWorker.vitals.heartRate} <span className="text-[10px] font-normal text-[#666861]">BPM</span>
+              </div>
+              <span className="text-[9px] text-[#2D8A61] font-medium">Normal Rhythm</span>
+            </div>
+
+            <div className="bg-[#FAF9F6] border border-[#ECEBE6] p-2 rounded-xl">
+              <div className="flex items-center justify-center space-x-1 text-[#666861] text-[10px] uppercase font-medium">
+                <Activity className="w-3 h-3 text-[#176B4D]" />
+                <span>Blood Oxygen</span>
+              </div>
+              <div className="font-serif font-bold text-lg text-[#151713] mt-0.5">
+                {activeWorker.vitals.spo2}%
+              </div>
+              <span className="text-[9px] text-[#2D8A61] font-medium">Optimal Saturation</span>
+            </div>
+
+            <div className="bg-[#FAF9F6] border border-[#ECEBE6] p-2 rounded-xl">
+              <div className="flex items-center justify-center space-x-1 text-[#666861] text-[10px] uppercase font-medium">
+                <Wind className="w-3 h-3 text-[#176B4D]" />
+                <span>Zone CH4</span>
+              </div>
+              <div className="font-serif font-bold text-lg text-[#151713] mt-0.5">
+                {selectedZoneTelemetry?.mq4 || 150} <span className="text-[10px] font-normal text-[#666861]">PPM</span>
+              </div>
+              <span className="text-[9px] text-[#2D8A61] font-medium">Safe Limit</span>
+            </div>
+          </div>
+        </div>
+
         {/* ===================================================================== */}
         {/* SAFETY REWARDS & CHAMPION COMMENDATION HERO CARD */}
         {/* ===================================================================== */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#176B4D] via-[#13563D] to-[#0D3828] text-white p-5 shadow-md space-y-4">
-          {/* Subtle decorative background ring */}
           <div className="absolute -right-8 -bottom-8 w-36 h-36 rounded-full bg-white/5 pointer-events-none" />
           <div className="absolute right-12 top-2 w-20 h-20 rounded-full bg-[#B47A18]/20 blur-xl pointer-events-none" />
 
@@ -270,8 +339,8 @@ export const WorkerHomePage: React.FC = () => {
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <div className="text-[10px] text-emerald-200/70 text-right">
-              Qualifies for ₹7,500 Diamond Safety Allowance + DGMS Gold Hardhat Decal
+            <div className="text-[10px] text-emerald-200/70 text-right font-mono">
+              Qualifies for ₹7,500 Diamond Allowance + DGMS Decal
             </div>
           </div>
 
@@ -397,50 +466,64 @@ export const WorkerHomePage: React.FC = () => {
           </div>
         </div>
 
-        {/* 4. MANDATORY EQUIPMENT VERIFICATION STATUS CARD */}
+        {/* 4. STATUTORY 7-POINT DGMS PPE VERIFICATION CHECKLIST */}
         <div className="bg-white border border-[#DCDAD4] p-4 rounded-2xl space-y-3 shadow-xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <ShieldCheck className="w-4 h-4 text-[#2D8A61]" />
               <span className="font-serif font-semibold text-xs text-[#151713]">
-                Mandatory Protective Equipment
+                DGMS Statutory 7-Point PPE Verification
               </span>
             </div>
             <span
-              className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-md border ${
-                allPpe
+              className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-md border ${
+                allPpeCompliant
                   ? 'bg-[#EAF3EF] text-[#2D8A61] border-[#2D8A61]/30'
                   : 'bg-[#FDF2F2] text-[#A83D45] border-[#A83D45]/30'
               }`}
             >
-              {allPpe ? 'All 4 Verified' : 'Incomplete'}
+              {compliantCount}/7 STATUTORY PASS {allPpeCompliant ? '✓' : '⚠'}
             </span>
           </div>
 
-          <div className="grid grid-cols-4 gap-2 text-center text-xs">
-            <div className="bg-[#FAF9F6] border border-[#ECEBE6] p-2 rounded-xl">
-              <div className="font-medium text-[#151713] text-xs">Helmet</div>
-              <div className="font-semibold text-[#2D8A61] text-[10px] mt-0.5">Active</div>
-            </div>
-            <div className="bg-[#FAF9F6] border border-[#ECEBE6] p-2 rounded-xl">
-              <div className="font-medium text-[#151713] text-xs">High-Vis</div>
-              <div className="font-semibold text-[#2D8A61] text-[10px] mt-0.5">Worn</div>
-            </div>
-            <div className="bg-[#FAF9F6] border border-[#ECEBE6] p-2 rounded-xl">
-              <div className="font-medium text-[#151713] text-xs">Boots</div>
-              <div className="font-semibold text-[#2D8A61] text-[10px] mt-0.5">Steel-Toe</div>
-            </div>
-            <div className="bg-[#FAF9F6] border border-[#ECEBE6] p-2 rounded-xl">
-              <div className="font-medium text-[#151713] text-xs">Gloves</div>
-              <div className="font-semibold text-[#2D8A61] text-[10px] mt-0.5">Fitted</div>
-            </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            {statutoryPpeItems.map((item) => (
+              <div
+                key={item.id}
+                className={`p-2.5 rounded-xl border flex flex-col justify-between transition-all ${
+                  item.ok
+                    ? 'bg-[#EAF3EF]/60 border-[#2D8A61]/30 text-[#151713]'
+                    : 'bg-[#FDF2F2] border-[#A83D45]/40 text-[#A83D45]'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-xs">{item.name}</span>
+                  {item.ok ? (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#2D8A61]" />
+                  ) : (
+                    <X className="w-3.5 h-3.5 text-[#A83D45]" />
+                  )}
+                </div>
+                <span className="text-[9px] font-mono text-[#666861] mt-1">
+                  {item.spec}
+                </span>
+                <span
+                  className={`text-[9.5px] font-mono font-bold mt-1 ${
+                    item.ok ? 'text-[#2D8A61]' : 'text-[#A83D45]'
+                  }`}
+                >
+                  {item.ok ? '● VERIFIED ON' : '✕ MISSING'}
+                </span>
+              </div>
+            ))}
           </div>
 
           <button
+            type="button"
             onClick={() => navigate('/live-safety')}
             className="w-full py-2.5 bg-[#FAF9F6] hover:bg-[#ECEBE6] border border-[#DCDAD4] text-xs text-[#151713] font-medium rounded-xl transition-colors flex items-center justify-center space-x-1.5"
           >
-            <span>View Personal Telemetry & Environmental Safety</span>
+            <span>View Full Subterranean Telemetry & Gas Safety</span>
             <ArrowRight className="w-3.5 h-3.5 text-[#666861]" />
           </button>
         </div>
