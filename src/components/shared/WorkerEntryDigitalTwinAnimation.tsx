@@ -11,9 +11,6 @@ import {
   Maximize2,
   Minimize2,
   Radio,
-  CheckCircle2,
-  ChevronRight,
-  Sparkles,
 } from 'lucide-react';
 
 // =============================================================================
@@ -28,7 +25,11 @@ function smoothstep(min: number, max: number, value: number): number {
 }
 
 // Linear interpolation between two 3D vectors
-function vLerp(v1: [number, number, number], v2: [number, number, number], t: number): [number, number, number] {
+function vLerp(
+  v1: [number, number, number],
+  v2: [number, number, number],
+  t: number
+): [number, number, number] {
   return [
     v1[0] + (v2[0] - v1[0]) * t,
     v1[1] + (v2[1] - v1[1]) * t,
@@ -64,11 +65,6 @@ const AnimatedWorker: React.FC<WorkerModelProps> = ({
   const bodyRef = useRef<THREE.Group>(null);
 
   // Smooth continuous Z path along the mine adit & haulage drift
-  // Scene 1: 0.00 -> 0.20 : Surface approach (z: 8.5 -> 3.0)
-  // Scene 2: 0.20 -> 0.38 : Entry Turnstile & Scan (z: 3.0 -> 1.5)
-  // Scene 3: 0.38 -> 0.65 : Transition into Haulage Drift (z: 1.5 -> -6.5)
-  // Scene 4: 0.65 -> 0.84 : Walking into Tunnel B-04 (z: -6.5 -> -12.0)
-  // Scene 5: 0.84 -> 1.00 : Hero Stand for 3D Holographic PPE Inspection (z: -12.0)
   const workerZ = useMemo(() => {
     if (progress < 0.2) {
       const t = smoothstep(0, 0.2, progress);
@@ -152,38 +148,32 @@ const AnimatedWorker: React.FC<WorkerModelProps> = ({
             <meshBasicMaterial color="#10B981" side={THREE.DoubleSide} transparent opacity={0.12} />
           </mesh>
 
-          {/* Clean Industrial Identification Marker */}
+          {/* Clean Dark Glassmorphic Identification Marker */}
           <Html position={[0, 2.65, 0]} center distanceFactor={11}>
-            <div className="bg-white/95 border border-[#176B4D] rounded-2xl p-3.5 shadow-2xl backdrop-blur-md text-left font-mono min-w-[230px] select-none animate-in fade-in zoom-in-95 duration-200">
-              <div className="flex items-center justify-between border-b border-[#ECEBE6] pb-1.5 mb-2">
-                <span className="text-[10px] font-bold text-[#176B4D] flex items-center space-x-1.5">
-                  <Radio className="w-3.5 h-3.5 text-[#176B4D] animate-pulse" />
-                  <span>BIOMETRIC RFID VERIFIED</span>
+            <div className="bg-[#111310]/85 border border-[#2DD4BF]/40 rounded-xl px-3.5 py-2.5 shadow-2xl backdrop-blur-md text-left font-mono min-w-[210px] select-none text-white animate-in fade-in zoom-in-95 duration-200">
+              <div className="flex items-center justify-between border-b border-white/15 pb-1 mb-1.5 text-[10px]">
+                <span className="font-bold text-[#2DD4BF] flex items-center space-x-1.5">
+                  <Radio className="w-3 h-3 text-[#2DD4BF] animate-pulse" />
+                  <span>ENTRY GATE SCAN</span>
                 </span>
-                <span className="text-[9px] bg-[#EAF3EF] text-[#176B4D] font-bold px-2 py-0.5 rounded-full border border-[#176B4D]/20">
-                  PORTAL 01
-                </span>
+                <span className="text-[9px] text-[#A3A199]">PORTAL 01</span>
               </div>
-              <div className="space-y-1">
-                <div className="text-xs font-bold text-[#151713] flex items-center justify-between">
-                  <span>WORKER ID:</span>
-                  <span className="text-[#176B4D] font-bold">MW-024</span>
+              <div className="space-y-0.5 text-[10px]">
+                <div className="flex justify-between">
+                  <span className="text-[#A3A199]">WORKER ID:</span>
+                  <span className="font-bold text-white">MW-024</span>
                 </div>
-                <div className="text-[11px] text-[#151713] flex items-center justify-between">
-                  <span>PERSONNEL:</span>
-                  <span className="font-semibold">Deepika Acharya</span>
+                <div className="flex justify-between">
+                  <span className="text-[#A3A199]">STATUS:</span>
+                  <span className="font-bold text-[#2DD4BF]">VERIFIED ✓</span>
                 </div>
-                <div className="text-[11px] text-[#2D8A61] flex items-center justify-between font-semibold">
-                  <span>STATUS:</span>
-                  <span>VERIFIED ✓</span>
+                <div className="flex justify-between">
+                  <span className="text-[#A3A199]">PPE:</span>
+                  <span className="font-bold text-[#2DD4BF]">COMPLIANT</span>
                 </div>
-                <div className="text-[11px] text-[#176B4D] flex items-center justify-between font-semibold">
-                  <span>PPE COMPLIANCE:</span>
-                  <span>4/4 MANDATORY</span>
-                </div>
-                <div className="text-[10px] text-[#666861] pt-1 border-t border-[#ECEBE6] flex items-center justify-between">
+                <div className="flex justify-between text-[9px] pt-1 border-t border-white/10 text-[#A3A199]">
                   <span>LOCATION:</span>
-                  <span className="font-semibold text-[#151713]">SURFACE ENTRY GATE</span>
+                  <span className="text-white">ENTRY GATE</span>
                 </div>
               </div>
             </div>
@@ -194,21 +184,16 @@ const AnimatedWorker: React.FC<WorkerModelProps> = ({
       {/* ==================== SCENE 4: EXACT WORKER LOCATION MARKER ==================== */}
       {activeScene === 4 && (
         <Html position={[0, 2.7, 0]} center distanceFactor={13}>
-          <div className="bg-[#151713]/95 border border-[#2D8A61] text-white rounded-2xl px-4 py-3 shadow-2xl backdrop-blur-md font-mono text-left select-none whitespace-nowrap min-w-[220px]">
-            <div className="flex items-center space-x-2 text-[#2DD4BF] text-xs font-bold mb-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#2DD4BF] animate-ping" />
-              <span>● MW-024 · DEEPIKA ACHARYA</span>
+          <div className="bg-[#111310]/85 border border-[#2D8A61]/50 text-white rounded-xl px-3.5 py-2.5 shadow-2xl backdrop-blur-md font-mono text-left select-none whitespace-nowrap min-w-[200px]">
+            <div className="flex items-center space-x-2 text-[#2DD4BF] text-[11px] font-bold mb-0.5">
+              <span className="w-2 h-2 rounded-full bg-[#2DD4BF] animate-ping" />
+              <span>● MW-024</span>
             </div>
-            <div className="text-[11px] font-bold text-white tracking-wide">
+            <div className="text-[10px] font-bold text-white tracking-wide">
               LEVEL 2 // TUNNEL B-04
             </div>
-            <div className="text-[10px] text-[#A3A199] mt-0.5">
-              {distanceFromJunction} m FROM EAST JUNCTION
-            </div>
-            <div className="mt-2 pt-1.5 border-t border-white/10 flex items-center justify-between text-[9px] text-[#2DD4BF]">
-              <span>CH4: 0.02% (SAFE)</span>
-              <span>HR: 74 BPM</span>
-              <span>LORA: -68 dBm</span>
+            <div className="text-[9px] text-[#A3A199] mt-0.5">
+              {distanceFromJunction} m FROM JUNCTION
             </div>
           </div>
         </Html>
@@ -250,59 +235,59 @@ const AnimatedWorker: React.FC<WorkerModelProps> = ({
             <meshBasicMaterial color="#2D8A61" wireframe transparent opacity={0.5} />
           </mesh>
 
-          {/* Floating Minimal PPE Status HUD Card */}
+          {/* Clean Dark Glassmorphic PPE Status Card */}
           <Html position={[0, 2.75, 0]} center distanceFactor={12}>
-            <div className="bg-white/95 border border-[#DCDAD4] rounded-2xl p-4 shadow-2xl backdrop-blur-md text-left font-mono min-w-[240px] select-none">
-              <div className="flex items-center justify-between border-b border-[#ECEBE6] pb-2 mb-2.5">
-                <span className="text-[11px] font-bold text-[#151713] flex items-center space-x-1.5">
-                  <ShieldCheck className="w-4 h-4 text-[#176B4D]" />
-                  <span>3D PPE TELEMETRY</span>
+            <div className="bg-[#111310]/85 border border-[#2D8A61]/50 rounded-2xl p-3.5 shadow-2xl backdrop-blur-md text-left font-mono min-w-[210px] select-none text-white">
+              <div className="flex items-center justify-between border-b border-white/15 pb-1.5 mb-2">
+                <span className="text-[10px] font-bold text-white flex items-center space-x-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#2DD4BF]" />
+                  <span>3D PPE STATUS</span>
                 </span>
-                <span className="text-[9px] bg-[#FAF9F6] text-[#666861] px-2 py-0.5 rounded-full border border-[#DCDAD4] font-bold">
+                <span className="text-[9px] bg-white/10 text-[#A3A199] px-2 py-0.5 rounded-full border border-white/15 font-bold">
                   MW-024
                 </span>
               </div>
 
               {/* Individual Item Badges */}
-              <div className="space-y-1.5 text-[11px]">
+              <div className="space-y-1 text-[10px]">
                 {/* 1. HELMET */}
                 <div
-                  className={`flex items-center justify-between px-2.5 py-1.5 rounded-xl border transition-colors ${
+                  className={`flex items-center justify-between px-2 py-1 rounded-lg border transition-colors ${
                     missingPpe
-                      ? 'bg-[#FDF2F2] border-[#A83D45]/40 text-[#A83D45] font-bold'
-                      : 'bg-[#EAF3EF] border-[#2D8A61]/30 text-[#2D8A61] font-semibold'
+                      ? 'bg-[#A83D45]/30 border-[#A83D45] text-[#F87171] font-bold'
+                      : 'bg-[#2D8A61]/20 border-[#2D8A61]/40 text-[#2DD4BF] font-semibold'
                   }`}
                 >
                   <span className="flex items-center space-x-1.5">
                     <span>{missingPpe ? '✗' : '✓'}</span>
-                    <span>HELMET (CAP LAMP)</span>
+                    <span>HELMET</span>
                   </span>
                   <span className="font-bold">{missingPpe ? 'MISSING' : 'OK'}</span>
                 </div>
 
                 {/* 2. REFLECTIVE VEST */}
-                <div className="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-[#EAF3EF] border border-[#2D8A61]/30 text-[#2D8A61] font-semibold">
+                <div className="flex items-center justify-between px-2 py-1 rounded-lg bg-[#2D8A61]/20 border border-[#2D8A61]/40 text-[#2DD4BF] font-semibold">
                   <span className="flex items-center space-x-1.5">
                     <span>✓</span>
-                    <span>SAFETY VEST (CLASS 3)</span>
+                    <span>SAFETY VEST</span>
                   </span>
                   <span className="font-bold">OK</span>
                 </div>
 
                 {/* 3. SAFETY BOOTS */}
-                <div className="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-[#EAF3EF] border border-[#2D8A61]/30 text-[#2D8A61] font-semibold">
+                <div className="flex items-center justify-between px-2 py-1 rounded-lg bg-[#2D8A61]/20 border border-[#2D8A61]/40 text-[#2DD4BF] font-semibold">
                   <span className="flex items-center space-x-1.5">
                     <span>✓</span>
-                    <span>STEEL-TOE BOOTS</span>
+                    <span>BOOTS</span>
                   </span>
                   <span className="font-bold">OK</span>
                 </div>
 
                 {/* 4. PROTECTIVE GLOVES */}
-                <div className="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-[#EAF3EF] border border-[#2D8A61]/30 text-[#2D8A61] font-semibold">
+                <div className="flex items-center justify-between px-2 py-1 rounded-lg bg-[#2D8A61]/20 border border-[#2D8A61]/40 text-[#2DD4BF] font-semibold">
                   <span className="flex items-center space-x-1.5">
                     <span>✓</span>
-                    <span>CUT-RESISTANT GLOVES</span>
+                    <span>GLOVES</span>
                   </span>
                   <span className="font-bold">OK</span>
                 </div>
@@ -310,11 +295,11 @@ const AnimatedWorker: React.FC<WorkerModelProps> = ({
 
               {/* Statutory Missing PPE Warning Alert */}
               {missingPpe && (
-                <div className="mt-2.5 p-2.5 rounded-xl bg-[#A83D45] text-white text-[11px] font-sans font-semibold flex items-center space-x-2 shadow-sm animate-pulse">
-                  <AlertTriangle className="w-4 h-4 text-white shrink-0" />
+                <div className="mt-2 p-2 rounded-xl bg-[#A83D45] text-white text-[10px] font-sans font-semibold flex items-center space-x-1.5 shadow-sm animate-pulse">
+                  <AlertTriangle className="w-3.5 h-3.5 text-white shrink-0" />
                   <div>
-                    <div className="font-bold">⚠ PPE ALERT: NON-COMPLIANT</div>
-                    <div className="text-[10px] text-white/90">Missing: Safety Helmet</div>
+                    <div className="font-bold">⚠ PPE ALERT</div>
+                    <div className="text-[9px] text-white/90">Missing: Safety Helmet</div>
                   </div>
                 </div>
               )}
@@ -567,17 +552,6 @@ const MineEntrancePortal: React.FC = () => {
         <meshStandardMaterial color="#facc15" roughness={0.4} />
       </mesh>
 
-      {/* Industrial Gantry Signage */}
-      <mesh position={[0, 4.25, 0.32]}>
-        <boxGeometry args={[3.2, 0.45, 0.05]} />
-        <meshStandardMaterial color="#1C2026" />
-      </mesh>
-      <Html position={[0, 4.25, 0.38]} center distanceFactor={13}>
-        <div className="font-mono text-[9px] tracking-wider text-[#F6F5F1] font-bold whitespace-nowrap uppercase px-2.5 py-0.5 bg-[#176B4D] border border-white/20 rounded shadow-xs">
-          PORTAL 01 // ADIT ACCESS // DGMS RULE 181
-        </div>
-      </Html>
-
       {/* Overhead Entry Luminaire */}
       <pointLight position={[0, 3.4, 0.45]} intensity={1.8} distance={8} color="#FFF8E7" />
       <mesh position={[0, 3.45, 0.25]}>
@@ -757,56 +731,6 @@ const DigitalTwinMineNetwork: React.FC = () => {
           <meshStandardMaterial color="#C2410C" roughness={0.5} />
         </mesh>
       </group>
-
-      {/* CAD 3D Spatial Zone Billboards */}
-      <group position={[0, 3.8, 0]}>
-        <Html center distanceFactor={14}>
-          <div className="px-2.5 py-0.5 rounded-lg border border-[#176B4D] bg-white/95 text-[#176B4D] font-mono text-[9px] font-bold shadow-xs whitespace-nowrap">
-            ZONE A // SURFACE ADIT (LEVEL 0 · 0m)
-          </div>
-        </Html>
-      </group>
-
-      <group position={[4.5, 3.5, -11]}>
-        <Html center distanceFactor={14}>
-          <div className="px-2.5 py-0.5 rounded-lg border border-[#176B4D] bg-white/95 text-[#176B4D] font-mono text-[9px] font-bold shadow-xs whitespace-nowrap">
-            ZONE B // TUNNEL B-04 (LEVEL 2 · -260m)
-          </div>
-        </Html>
-      </group>
-
-      <group position={[-8.5, 3.5, -6]}>
-        <Html center distanceFactor={14}>
-          <div className="px-2.5 py-0.5 rounded-lg border border-[#176B4D] bg-white/95 text-[#176B4D] font-mono text-[9px] font-bold shadow-xs whitespace-nowrap">
-            ZONE C // LONGWALL FACE (LEVEL 4 · -440m)
-          </div>
-        </Html>
-      </group>
-
-      {/* Secondary Background Personnel Markers */}
-      <group position={[7.5, 0, -11]}>
-        <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.3, 0.42, 16]} />
-          <meshBasicMaterial color="#2D8A61" />
-        </mesh>
-        <Html position={[0, 1.8, 0]} center distanceFactor={18}>
-          <div className="bg-white/90 border border-[#DCDAD4] px-2 py-0.5 rounded text-[8px] font-mono text-[#666861] whitespace-nowrap">
-            WM-4812 · RAVI (SAFE)
-          </div>
-        </Html>
-      </group>
-
-      <group position={[-9.0, 0, -5]}>
-        <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.3, 0.42, 16]} />
-          <meshBasicMaterial color="#2D8A61" />
-        </mesh>
-        <Html position={[0, 1.8, 0]} center distanceFactor={18}>
-          <div className="bg-white/90 border border-[#DCDAD4] px-2 py-0.5 rounded text-[8px] font-mono text-[#666861] whitespace-nowrap">
-            WM-8492 · VIKRAM (SAFE)
-          </div>
-        </Html>
-      </group>
     </group>
   );
 };
@@ -908,58 +832,14 @@ export const WorkerEntryDigitalTwinAnimation: React.FC<WorkerEntryProps> = ({
 
   return (
     <div
-      className={`rounded-2xl border border-[#DCDAD4] bg-white/90 backdrop-blur-md shadow-sm overflow-hidden flex flex-col transition-all ${
+      className={`rounded-2xl border border-[#DCDAD4] bg-[#F6F5F1] shadow-sm overflow-hidden flex flex-col transition-all ${
         isExpanded ? 'fixed inset-4 z-50 max-w-none shadow-2xl' : 'w-full max-w-xl'
       } ${className}`}
     >
-      {/* 1. Industrial Header Bar */}
-      <div className="px-4 py-3 border-b border-[#EDECE7] bg-[#FAF9F6] flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center space-x-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#176B4D] animate-pulse" />
-          <div>
-            <div className="font-mono text-[11px] font-bold text-[#151713] tracking-wide">
-              SUBTERRANEAN ENTRY TELEMETRY // 3D DIGITAL TWIN
-            </div>
-            <div className="text-[10px] text-[#666861]">
-              Portal Adit → Gate Verification → Spatial Twin → PPE Monitoring
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          {/* Missing PPE Simulation Toggle */}
-          <button
-            type="button"
-            onClick={() => {
-              setMissingPpe(!missingPpe);
-              if (!missingPpe) handleJumpToScene(5);
-            }}
-            className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold border transition-colors ${
-              missingPpe
-                ? 'bg-[#FDF2F2] border-[#A83D45] text-[#A83D45]'
-                : 'bg-white border-[#DCDAD4] text-[#666861] hover:text-[#151713]'
-            }`}
-            title="Toggle between Nominal 100% PPE and Alert State"
-          >
-            {missingPpe ? '⚠ ALERT: MISSING HELMET' : '✓ 100% PPE NOMINAL'}
-          </button>
-
-          {/* Fullscreen Expand / Collapse */}
-          <button
-            type="button"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1.5 rounded-lg border border-[#DCDAD4] bg-white text-[#666861] hover:text-[#151713] transition-colors"
-            title={isExpanded ? 'Minimize View' : 'Expand Cinematic View'}
-          >
-            {isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
-          </button>
-        </div>
-      </div>
-
-      {/* 2. Interactive 3D Canvas Viewport */}
+      {/* 1. Interactive 3D Canvas Viewport with Clean Overlay Controls */}
       <div
         className={`relative bg-[#F6F5F1] w-full ${
-          isExpanded ? 'h-[calc(100vh-170px)]' : 'h-[330px] sm:h-[360px]'
+          isExpanded ? 'h-[calc(100vh-90px)]' : 'h-[340px] sm:h-[370px]'
         }`}
       >
         <Canvas
@@ -997,32 +877,53 @@ export const WorkerEntryDigitalTwinAnimation: React.FC<WorkerEntryProps> = ({
           />
         </Canvas>
 
-        {/* Current Active Scene Overlay Badge */}
-        <div className="absolute top-3 left-3 bg-white/95 border border-[#DCDAD4] backdrop-blur-md rounded-xl px-3 py-1.5 shadow-xs font-mono flex items-center space-x-2 pointer-events-none">
-          <span className="w-2 h-2 rounded-full bg-[#2D8A61]" />
-          <span className="text-[10px] font-bold text-[#151713]">
-            {activeScene === 1 && 'SCENE 1 // MINE ENTRANCE ADIT'}
-            {activeScene === 2 && 'SCENE 2 // WORKER IDENTIFICATION & SCAN'}
-            {activeScene === 3 && 'SCENE 3 // DIGITAL TWIN NETWORK TRANSITION'}
-            {activeScene === 4 && 'SCENE 4 // EXACT SUBTERRANEAN LOCATION'}
-            {activeScene === 5 && 'SCENE 5 // HOLOGRAPHIC PPE MONITORING'}
+        {/* Discreet Top-Left Scene Pill */}
+        <div className="absolute top-3 left-3 bg-[#111310]/75 backdrop-blur-md border border-white/10 rounded-lg px-2.5 py-1 shadow-xs font-mono flex items-center space-x-2 pointer-events-none">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#2DD4BF] animate-pulse" />
+          <span className="text-[10px] font-bold text-white tracking-wider">
+            {activeScene === 1 && 'SCENE 1 // MINE ENTRANCE'}
+            {activeScene === 2 && 'SCENE 2 // IDENTIFICATION SCAN'}
+            {activeScene === 3 && 'SCENE 3 // DIGITAL TWIN'}
+            {activeScene === 4 && 'SCENE 4 // EXACT LOCATION'}
+            {activeScene === 5 && 'SCENE 5 // HOLOGRAPHIC PPE'}
           </span>
         </div>
 
-        {/* Real-time Subterranean Metrics HUD Pill */}
-        <div className="absolute bottom-3 left-3 bg-white/95 border border-[#DCDAD4] backdrop-blur-md rounded-xl px-3 py-1 shadow-2xs font-mono text-[9px] text-[#666861] hidden sm:flex items-center space-x-3 pointer-events-none">
-          <span>WORKER: MW-024 (DEEPIKA)</span>
-          <span>•</span>
-          <span>MESH: 868 MHz NOMINAL</span>
-          <span>•</span>
-          <span>STRATA: JHARIA SEAM 4</span>
+        {/* Discreet Top-Right Overlay Controls */}
+        <div className="absolute top-3 right-3 flex items-center space-x-1.5 z-20">
+          {/* Missing PPE Simulation Toggle */}
+          <button
+            type="button"
+            onClick={() => {
+              setMissingPpe(!missingPpe);
+              if (!missingPpe) handleJumpToScene(5);
+            }}
+            className={`px-2 py-1 rounded-lg text-[10px] font-mono font-bold border backdrop-blur-md transition-all shadow-xs ${
+              missingPpe
+                ? 'bg-[#A83D45]/90 border-[#A83D45] text-white'
+                : 'bg-[#111310]/75 border-white/10 text-[#2DD4BF] hover:bg-[#111310]/90'
+            }`}
+            title="Toggle between Nominal 100% PPE and Alert State"
+          >
+            {missingPpe ? '⚠ ALERT: NO HELMET' : '✓ 100% PPE'}
+          </button>
+
+          {/* Fullscreen Expand / Collapse */}
+          <button
+            type="button"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="p-1 rounded-lg border border-white/10 bg-[#111310]/75 backdrop-blur-md text-white/80 hover:text-white transition-colors shadow-xs"
+            title={isExpanded ? 'Minimize View' : 'Expand Cinematic View'}
+          >
+            {isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+          </button>
         </div>
       </div>
 
-      {/* 3. Interactive Scene Navigation & Playback Controls */}
-      <div className="p-3 bg-white border-t border-[#EDECE7] space-y-2.5">
-        {/* Five Scene Jump Buttons */}
-        <div className="grid grid-cols-5 gap-1.5 text-center">
+      {/* 2. Interactive Scene Navigation & Playback Controls */}
+      <div className="p-2.5 bg-white border-t border-[#EDECE7] space-y-2">
+        {/* Five Clean Scene Jump Tabs */}
+        <div className="grid grid-cols-5 gap-1 text-center">
           {[
             { num: 1, label: '1. Entrance' },
             { num: 2, label: '2. Scan' },
@@ -1034,7 +935,7 @@ export const WorkerEntryDigitalTwinAnimation: React.FC<WorkerEntryProps> = ({
               key={sc.num}
               type="button"
               onClick={() => handleJumpToScene(sc.num)}
-              className={`py-1.5 px-1 rounded-lg text-[10px] font-mono font-bold transition-all truncate ${
+              className={`py-1 px-1 rounded-lg text-[10px] font-mono font-bold transition-all truncate ${
                 activeScene === sc.num
                   ? 'bg-[#176B4D] text-white shadow-2xs'
                   : 'bg-[#FAF9F6] border border-[#DCDAD4] text-[#666861] hover:text-[#151713] hover:bg-[#F2EFE9]'
@@ -1046,7 +947,7 @@ export const WorkerEntryDigitalTwinAnimation: React.FC<WorkerEntryProps> = ({
         </div>
 
         {/* Timeline Slider and Play/Pause Controls */}
-        <div className="flex items-center space-x-3 pt-1">
+        <div className="flex items-center space-x-2.5 pt-0.5">
           <button
             type="button"
             onClick={() => setIsPlaying(!isPlaying)}
@@ -1074,11 +975,11 @@ export const WorkerEntryDigitalTwinAnimation: React.FC<WorkerEntryProps> = ({
               step="0.005"
               value={progress}
               onChange={(e) => setProgress(parseFloat(e.target.value))}
-              className="w-full accent-[#176B4D] cursor-pointer h-1.5 bg-[#EDECE7] rounded-lg appearance-none"
+              className="w-full accent-[#176B4D] cursor-pointer h-1 bg-[#EDECE7] rounded-lg appearance-none"
             />
           </div>
 
-          <span className="font-mono text-[10px] text-[#666861] w-12 text-right shrink-0">
+          <span className="font-mono text-[10px] text-[#666861] w-10 text-right shrink-0">
             {Math.round(progress * 100)}%
           </span>
         </div>
